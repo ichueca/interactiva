@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicios Interactivos - Java Streams</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        #marcador-global {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .equipo-score {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+        .equipo-A-score {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .equipo-B-score {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        #contenedor-equipos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .zona-equipo {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            min-height: 600px;
+        }
+
+        .zona-equipo.equipo-A {
+            border: 5px solid #ff6b6b;
+        }
+
+        .zona-equipo.equipo-B {
+            border: 5px solid #4ecdc4;
+        }
+
+        .titulo-equipo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .equipo-A .titulo-equipo {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .equipo-B .titulo-equipo {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .ejercicio {
+            margin-bottom: 30px;
+        }
+
+        .ejercicio-titulo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .enunciado {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffd700;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        /* Ejercicio 1: Pipeline */
+        .banco-piezas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            min-height: 100px;
+        }
+
+        .pieza-codigo {
+            background: #007bff;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: grab;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            position: relative;
+        }
+
+        .pieza-codigo:active {
+            cursor: grabbing;
+        }
+
+        .pieza-codigo.dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+
+        .pipeline-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .slot {
+            min-height: 60px;
+            border: 3px dashed #ccc;
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .slot.over {
+            border-color: #28a745;
+            background: #e8f5e9;
+            transform: scale(1.02);
+        }
+
+        .slot.filled {
+            border-style: solid;
+            border-color: #007bff;
+        }
+
+        .slot.correcto {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .slot.incorrecto {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        /* Ejercicio 2: Ordenar líneas */
+        .lineas-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .linea-codigo {
+            background: white;
+            border: 2px solid #007bff;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: grab;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+
+        .linea-codigo:active {
+            cursor: grabbing;
+        }
+
+        .linea-codigo.dragging {
+            opacity: 0.5;
+            transform: scale(1.02);
+        }
+
+        .linea-numero {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .linea-codigo.correcto {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .linea-codigo.incorrecto {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-validar {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-validar:hover {
+            background: #218838;
+        }
+
+        .btn-reiniciar {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-reiniciar:hover {
+            background: #e0a800;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.exito {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+            display: block;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+            display: block;
+        }
+
+        .tiempo {
+            font-size: 16px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 1200px) {
+            #contenedor-equipos {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="marcador-global">
+        <div class="equipo-score equipo-A-score">
+            <span>🔴 EQUIPO A</span>
+            <div id="score-A" class="tiempo">--:--</div>
+        </div>
+        <div class="equipo-score equipo-B-score">
+            <span>🔵 EQUIPO B</span>
+            <div id="score-B" class="tiempo">--:--</div>
+        </div>
+    </div>
+
+    <div id="contenedor-equipos">
+        <!-- EQUIPO A -->
+        <div class="zona-equipo equipo-A" id="equipo-A">
+            <div class="titulo-equipo">🔴 EQUIPO A</div>
+            
+            <!-- Ejercicio 1: Pipeline -->
+            <div class="ejercicio" id="ejercicio1-A">
+                <div class="ejercicio-titulo">📝 Ejercicio 1: Construir Pipeline</div>
+                <div class="enunciado">
+                    Arrastra las operaciones para filtrar números pares y sumarlos:<br>
+                    <strong>Entrada:</strong> List.of(1, 2, 3, 4, 5, 6)
+                </div>
+                
+                <div class="banco-piezas" id="banco-A-ej1">
+                    <div class="pieza-codigo" draggable="true" data-id="filter">filter(n -> n % 2 == 0)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="map">map(n -> n * 2)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="mapToInt">mapToInt(Integer::intValue)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="sum">sum()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="sorted">sorted()</div>
+                </div>
+
+                <div class="pipeline-container">
+                    <div>int resultado = numeros.stream()</div>
+                    <div class="slot" data-slot="0" data-correcto="filter"></div>
+                    <div class="slot" data-slot="1" data-correcto="mapToInt"></div>
+                    <div class="slot" data-slot="2" data-correcto="sum"></div>
+                    <div style="margin-top: 10px;">;</div>
+                </div>
+
+                <div class="botones">
+                    <button class="btn-validar" onclick="validarPipeline('A')">✓ Validar</button>
+                    <button class="btn-reiniciar" onclick="reiniciarEjercicio('A', 1)">↻ Reiniciar</button>
+                </div>
+                <div class="feedback" id="feedback1-A"></div>
+            </div>
+
+            <!-- Ejercicio 2: Ordenar líneas -->
+            <div class="ejercicio" id="ejercicio2-A">
+                <div class="ejercicio-titulo">📝 Ejercicio 2: Ordenar Código</div>
+                <div class="enunciado">
+                    Arrastra las líneas para ordenar correctamente el código:
+                </div>
+                
+                <div class="lineas-container" id="lineas-A">
+                    <!-- Se generarán dinámicamente -->
+                </div>
+
+                <div class="botones">
+                    <button class="btn-validar" onclick="validarOrden('A')">✓ Validar</button>
+                    <button class="btn-reiniciar" onclick="reiniciarEjercicio('A', 2)">↻ Reiniciar</button>
+                </div>
+                <div class="feedback" id="feedback2-A"></div>
+            </div>
+        </div>
+
+        <!-- EQUIPO B -->
+        <div class="zona-equipo equipo-B" id="equipo-B">
+            <div class="titulo-equipo">🔵 EQUIPO B</div>
+            
+            <!-- Ejercicio 1: Pipeline -->
+            <div class="ejercicio" id="ejercicio1-B">
+                <div class="ejercicio-titulo">📝 Ejercicio 1: Construir Pipeline</div>
+                <div class="enunciado">
+                    Arrastra las operaciones para filtrar números pares y sumarlos:<br>
+                    <strong>Entrada:</strong> List.of(1, 2, 3, 4, 5, 6)
+                </div>
+                
+                <div class="banco-piezas" id="banco-B-ej1">
+                    <div class="pieza-codigo" draggable="true" data-id="filter">filter(n -> n % 2 == 0)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="map">map(n -> n * 2)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="mapToInt">mapToInt(Integer::intValue)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="sum">sum()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="sorted">sorted()</div>
+                </div>
+
+                <div class="pipeline-container">
+                    <div>int resultado = numeros.stream()</div>
+                    <div class="slot" data-slot="0" data-correcto="filter"></div>
+                    <div class="slot" data-slot="1" data-correcto="mapToInt"></div>
+                    <div class="slot" data-slot="2" data-correcto="sum"></div>
+                    <div style="margin-top: 10px;">;</div>
+                </div>
+
+                <div class="botones">
+                    <button class="btn-validar" onclick="validarPipeline('B')">✓ Validar</button>
+                    <button class="btn-reiniciar" onclick="reiniciarEjercicio('B', 1)">↻ Reiniciar</button>
+                </div>
+                <div class="feedback" id="feedback1-B"></div>
+            </div>
+
+            <!-- Ejercicio 2: Ordenar líneas -->
+            <div class="ejercicio" id="ejercicio2-B">
+                <div class="ejercicio-titulo">📝 Ejercicio 2: Ordenar Código</div>
+                <div class="enunciado">
+                    Arrastra las líneas para ordenar correctamente el código:
+                </div>
+                
+                <div class="lineas-container" id="lineas-B">
+                    <!-- Se generarán dinámicamente -->
+                </div>
+
+                <div class="botones">
+                    <button class="btn-validar" onclick="validarOrden('B')">✓ Validar</button>
+                    <button class="btn-reiniciar" onclick="reiniciarEjercicio('B', 2)">↻ Reiniciar</button>
+                </div>
+                <div class="feedback" id="feedback2-B"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        const estado = {
+            A: {
+                startTime: null,
+                endTime: null,
+                ejercicio1Completo: false,
+                ejercicio2Completo: false
+            },
+            B: {
+                startTime: null,
+                endTime: null,
+                ejercicio1Completo: false,
+                ejercicio2Completo: false
+            }
+        };
+
+        // Datos para ejercicio 2 (ordenar líneas)
+        const lineasCodigo = [
+            { id: 0, texto: 'List<String> nombres = List.of("Ana", "Pedro", "Juan");' },
+            { id: 1, texto: 'List<String> resultado = nombres.stream()' },
+            { id: 2, texto: '    .filter(n -> n.length() > 3)' },
+            { id: 3, texto: '    .map(String::toUpperCase)' },
+            { id: 4, texto: '    .sorted()' },
+            { id: 5, texto: '    .collect(Collectors.toList());' }
+        ];
+
+        // Inicializar ejercicio 2 para ambos equipos
+        function inicializarEjercicio2(equipo) {
+            const container = document.getElementById(`lineas-${equipo}`);
+            container.innerHTML = '';
+            
+            // Mezclar líneas
+            const lineasMezcladas = [...lineasCodigo].sort(() => Math.random() - 0.5);
+            
+            lineasMezcladas.forEach((linea, index) => {
+                const div = document.createElement('div');
+                div.className = 'linea-codigo';
+                div.draggable = true;
+                div.dataset.id = linea.id;
+                div.dataset.posicion = index;
+                div.innerHTML = `
+                    <span class="linea-numero">${index + 1}</span>
+                    <span>${linea.texto}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            configurarDragLineas(equipo);
+        }
+
+        // Configurar drag & drop para piezas de código (Ejercicio 1)
+        let draggedElement = null;
+        let draggedFrom = null;
+
+        function configurarDragPiezas(equipo) {
+            const piezas = document.querySelectorAll(`#equipo-${equipo} .pieza-codigo`);
+            const slots = document.querySelectorAll(`#equipo-${equipo} .slot`);
+
+            piezas.forEach(pieza => {
+                // Soporte para touch y mouse
+                pieza.addEventListener('dragstart', handleDragStart);
+                pieza.addEventListener('dragend', handleDragEnd);
+                
+                // Touch events
+                pieza.addEventListener('touchstart', handleTouchStart, { passive: false });
+                pieza.addEventListener('touchmove', handleTouchMove, { passive: false });
+                pieza.addEventListener('touchend', handleTouchEnd, { passive: false });
+            });
+
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            draggedFrom = this.parentElement;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('over');
+            
+            if (draggedElement) {
+                // Si el slot ya tiene contenido, devolverlo al banco
+                const existente = this.querySelector('.pieza-codigo');
+                if (existente) {
+                    draggedFrom.appendChild(existente);
+                }
+                
+                // Colocar la pieza en el slot
+                this.appendChild(draggedElement);
+                this.classList.add('filled');
+                
+                draggedElement = null;
+                draggedFrom = null;
+            }
+        }
+
+        // Touch support
+        let touchElement = null;
+        let touchClone = null;
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            touchElement = this;
+            draggedFrom = this.parentElement;
+            
+            // Crear clon visual
+            touchClone = this.cloneNode(true);
+            touchClone.style.position = 'fixed';
+            touchClone.style.zIndex = '10000';
+            touchClone.style.opacity = '0.8';
+            touchClone.style.pointerEvents = 'none';
+            document.body.appendChild(touchClone);
+            
+            const touch = e.touches[0];
+            touchClone.style.left = touch.clientX - 50 + 'px';
+            touchClone.style.top = touch.clientY - 20 + 'px';
+            
+            this.classList.add('dragging');
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!touchClone) return;
+            
+            const touch = e.touches[0];
+            touchClone.style.left = touch.clientX - 50 + 'px';
+            touchClone.style.top = touch.clientY - 20 + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (!touchElement) return;
+            
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Buscar el slot más cercano
+            let slot = dropTarget;
+            while (slot && !slot.classList.contains('slot')) {
+                slot = slot.parentElement;
+            }
+            
+            if (slot && slot.classList.contains('slot')) {
+                // Si el slot ya tiene contenido, devolverlo al banco
+                const existente = slot.querySelector('.pieza-codigo');
+                if (existente) {
+                    draggedFrom.appendChild(existente);
+                }
+                
+                // Colocar la pieza en el slot
+                slot.appendChild(touchElement);
+                slot.classList.add('filled');
+            }
+            
+            touchElement.classList.remove('dragging');
+            if (touchClone) {
+                document.body.removeChild(touchClone);
+            }
+            touchElement = null;
+            touchClone = null;
+            draggedFrom = null;
+        }
+
+        // Configurar drag & drop para líneas (Ejercicio 2)
+        let draggedLinea = null;
+        let draggedLineaClone = null;
+
+        function configurarDragLineas(equipo) {
+            const lineas = document.querySelectorAll(`#lineas-${equipo} .linea-codigo`);
+            
+            lineas.forEach(linea => {
+                linea.addEventListener('dragstart', handleLineaDragStart);
+                linea.addEventListener('dragover', handleLineaDragOver);
+                linea.addEventListener('drop', handleLineaDrop);
+                linea.addEventListener('dragend', handleLineaDragEnd);
+                
+                // Touch events
+                linea.addEventListener('touchstart', handleLineaTouchStart, { passive: false });
+                linea.addEventListener('touchmove', handleLineaTouchMove, { passive: false });
+                linea.addEventListener('touchend', handleLineaTouchEnd, { passive: false });
+            });
+        }
+
+        function handleLineaDragStart(e) {
+            draggedLinea = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleLineaDragOver(e) {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(this.parentElement, e.clientY);
+            if (afterElement == null) {
+                this.parentElement.appendChild(draggedLinea);
+            } else {
+                this.parentElement.insertBefore(draggedLinea, afterElement);
+            }
+        }
+
+        function handleLineaDrop(e) {
+            e.preventDefault();
+        }
+
+        function handleLineaDragEnd(e) {
+            this.classList.remove('dragging');
+            actualizarNumerosLinea(this.parentElement);
+        }
+
+        function handleLineaTouchStart(e) {
+            e.preventDefault();
+            draggedLinea = this;
+            
+            draggedLineaClone = this.cloneNode(true);
+            draggedLineaClone.style.position = 'fixed';
+            draggedLineaClone.style.zIndex = '10000';
+            draggedLineaClone.style.opacity = '0.8';
+            draggedLineaClone.style.pointerEvents = 'none';
+            draggedLineaClone.style.width = this.offsetWidth + 'px';
+            document.body.appendChild(draggedLineaClone);
+            
+            const touch = e.touches[0];
+            draggedLineaClone.style.left = touch.clientX - this.offsetWidth / 2 + 'px';
+            draggedLineaClone.style.top = touch.clientY - 20 + 'px';
+            
+            this.classList.add('dragging');
+        }
+
+        function handleLineaTouchMove(e) {
+            e.preventDefault();
+            if (!draggedLineaClone) return;
+            
+            const touch = e.touches[0];
+            draggedLineaClone.style.left = touch.clientX - draggedLinea.offsetWidth / 2 + 'px';
+            draggedLineaClone.style.top = touch.clientY - 20 + 'px';
+        }
+
+        function handleLineaTouchEnd(e) {
+            e.preventDefault();
+            if (!draggedLinea) return;
+            
+            const touch = e.changedTouches[0];
+            const container = draggedLinea.parentElement;
+            const afterElement = getDragAfterElement(container, touch.clientY);
+            
+            if (afterElement == null) {
+                container.appendChild(draggedLinea);
+            } else {
+                container.insertBefore(draggedLinea, afterElement);
+            }
+            
+            draggedLinea.classList.remove('dragging');
+            if (draggedLineaClone) {
+                document.body.removeChild(draggedLineaClone);
+            }
+            
+            actualizarNumerosLinea(container);
+            draggedLinea = null;
+            draggedLineaClone = null;
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.linea-codigo:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function actualizarNumerosLinea(container) {
+            const lineas = container.querySelectorAll('.linea-codigo');
+            lineas.forEach((linea, index) => {
+                linea.querySelector('.linea-numero').textContent = index + 1;
+                linea.dataset.posicion = index;
+            });
+        }
+
+        // Validar Pipeline (Ejercicio 1)
+        function validarPipeline(equipo) {
+            if (!estado[equipo].startTime) {
+                estado[equipo].startTime = Date.now();
+            }
+
+            const slots = document.querySelectorAll(`#equipo-${equipo} #ejercicio1-${equipo} .slot`);
+            let todoCorrecto = true;
+            
+            slots.forEach(slot => {
+                const pieza = slot.querySelector('.pieza-codigo');
+                const correcto = slot.dataset.correcto;
+                
+                slot.classList.remove('correcto', 'incorrecto');
+                
+                if (pieza && pieza.dataset.id === correcto) {
+                    slot.classList.add('correcto');
+                } else {
+                    slot.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById(`feedback1-${equipo}`);
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.textContent = '¡Excelente! ✓ Pipeline correcto';
+                estado[equipo].ejercicio1Completo = true;
+                actualizarMarcador(equipo);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.textContent = '✗ Revisa las operaciones. Pista: filter → mapToInt → sum';
+            }
+        }
+
+        // Validar Orden (Ejercicio 2)
+        function validarOrden(equipo) {
+            if (!estado[equipo].startTime) {
+                estado[equipo].startTime = Date.now();
+            }
+
+            const lineas = document.querySelectorAll(`#lineas-${equipo} .linea-codigo`);
+            let todoCorrecto = true;
+            
+            lineas.forEach((linea, index) => {
+                linea.classList.remove('correcto', 'incorrecto');
+                
+                if (parseInt(linea.dataset.id) === index) {
+                    linea.classList.add('correcto');
+                } else {
+                    linea.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById(`feedback2-${equipo}`);
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.textContent = '¡Perfecto! ✓ Código ordenado correctamente';
+                estado[equipo].ejercicio2Completo = true;
+                actualizarMarcador(equipo);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.textContent = '✗ El orden no es correcto. Revisa la secuencia lógica';
+            }
+        }
+
+        // Actualizar marcador
+        function actualizarMarcador(equipo) {
+            if (estado[equipo].ejercicio1Completo && estado[equipo].ejercicio2Completo && !estado[equipo].endTime) {
+                estado[equipo].endTime = Date.now();
+                const tiempo = ((estado[equipo].endTime - estado[equipo].startTime) / 1000).toFixed(1);
+                document.getElementById(`score-${equipo}`).textContent = `✓ Completado en ${tiempo}s`;
+                
+                // Verificar si hay ganador
+                verificarGanador();
+            }
+        }
+
+        function verificarGanador() {
+            if (estado.A.endTime && estado.B.endTime) {
+                const tiempoA = estado.A.endTime - estado.A.startTime;
+                const tiempoB = estado.B.endTime - estado.B.startTime;
+                
+                const ganador = tiempoA < tiempoB ? 'A' : 'B';
+                const scoreDiv = document.getElementById(`score-${ganador}`);
+                scoreDiv.innerHTML += '<br>🏆 ¡GANADOR!';
+            }
+        }
+
+        // Reiniciar ejercicio
+        function reiniciarEjercicio(equipo, numEjercicio) {
+            if (numEjercicio === 1) {
+                // Reiniciar pipeline
+                const slots = document.querySelectorAll(`#equipo-${equipo} #ejercicio1-${equipo} .slot`);
+                const banco = document.getElementById(`banco-${equipo}-ej1`);
+                
+                slots.forEach(slot => {
+                    const pieza = slot.querySelector('.pieza-codigo');
+                    if (pieza) {
+                        banco.appendChild(pieza);
+                    }
+                    slot.classList.remove('filled', 'correcto', 'incorrecto');
+                });
+                
+                document.getElementById(`feedback1-${equipo}`).className = 'feedback';
+                estado[equipo].ejercicio1Completo = false;
+            } else {
+                // Reiniciar ordenar líneas
+                inicializarEjercicio2(equipo);
+                document.getElementById(`feedback2-${equipo}`).className = 'feedback';
+                estado[equipo].ejercicio2Completo = false;
+            }
+            
+            // Reiniciar tiempo si ambos ejercicios están sin completar
+            if (!estado[equipo].ejercicio1Completo && !estado[equipo].ejercicio2Completo) {
+                estado[equipo].startTime = null;
+                estado[equipo].endTime = null;
+                document.getElementById(`score-${equipo}`).textContent = '--:--';
+            }
+        }
+
+        // Inicializar todo
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarDragPiezas('A');
+            configurarDragPiezas('B');
+            inicializarEjercicio2('A');
+            inicializarEjercicio2('B');
+        });
+    </script>
+</body>
+</html>
