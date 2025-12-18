@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 2.2 - Transformaciones con Map</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🔄 Actividad 2.2: Transformaciones con Map</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Completa el código arrastrando la transformación correcta.</p>
+            </div>
+
+            <div class="transformacion-ejercicio">
+                <div class="caso-transformacion">
+                    <div class="caso-header">
+                        <strong>Caso 1:</strong> Convertir nombres a mayúsculas
+                    </div>
+                    <div class="caso-codigo">
+                        <code>nombres.stream().map(</code>
+                        <div class="slot-transformacion" data-correcto="toUpper"></div>
+                        <code>)</code>
+                    </div>
+                    <div class="caso-ejemplo">
+                        Entrada: ["ana", "luis"] → Salida: ["ANA", "LUIS"]
+                    </div>
+                </div>
+
+                <div class="caso-transformacion">
+                    <div class="caso-header">
+                        <strong>Caso 2:</strong> Obtener longitud de cada palabra
+                    </div>
+                    <div class="caso-codigo">
+                        <code>palabras.stream().map(</code>
+                        <div class="slot-transformacion" data-correcto="length"></div>
+                        <code>)</code>
+                    </div>
+                    <div class="caso-ejemplo">
+                        Entrada: ["hola", "mundo"] → Salida: [4, 5]
+                    </div>
+                </div>
+
+                <div class="caso-transformacion">
+                    <div class="caso-header">
+                        <strong>Caso 3:</strong> Duplicar cada número
+                    </div>
+                    <div class="caso-codigo">
+                        <code>numeros.stream().map(</code>
+                        <div class="slot-transformacion" data-correcto="doble"></div>
+                        <code>)</code>
+                    </div>
+                    <div class="caso-ejemplo">
+                        Entrada: [1, 2, 3] → Salida: [2, 4, 6]
+                    </div>
+                </div>
+
+                <div class="transformaciones-banco" id="banco">
+                    <div class="transformacion-pieza" draggable="true" data-id="toUpper">String::toUpperCase</div>
+                    <div class="transformacion-pieza" draggable="true" data-id="length">String::length</div>
+                    <div class="transformacion-pieza" draggable="true" data-id="doble">n -> n * 2</div>
+                    <div class="transformacion-pieza" draggable="true" data-id="toLower">String::toLowerCase</div>
+                    <div class="transformacion-pieza" draggable="true" data-id="cuadrado">n -> n * n</div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad2-3.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad2-2';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad2-2.html');
+            shuffleTransformaciones();
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shuffleTransformaciones() {
+            const banco = document.getElementById('banco');
+            const transformaciones = Array.from(banco.children);
+
+            for (let i = transformaciones.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [transformaciones[i], transformaciones[j]] = [transformaciones[j], transformaciones[i]];
+            }
+
+            transformaciones.forEach(trans => banco.appendChild(trans));
+        }
+
+        function configurarDragDrop() {
+            const transformaciones = document.querySelectorAll('.transformacion-pieza');
+            const slots = document.querySelectorAll('.slot-transformacion');
+            
+            transformaciones.forEach(trans => {
+                trans.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('transformacion', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                });
+                
+                trans.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const transId = e.dataTransfer.getData('transformacion');
+                    const transElement = document.querySelector(`[data-id="${transId}"]`);
+                    
+                    const existente = slot.querySelector('.transformacion-pieza');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(transElement);
+                });
+            });
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const slots = document.querySelectorAll('.slot-transformacion');
+            let todoCorrecto = true;
+            let correctas = 0;
+            
+            slots.forEach(slot => {
+                const correcto = slot.dataset.correcto;
+                const transformacion = slot.querySelector('.transformacion-pieza');
+                
+                const caso = slot.closest('.caso-transformacion');
+                caso.classList.remove('correcto', 'incorrecto');
+                
+                if (transformacion && transformacion.dataset.id === correcto) {
+                    caso.classList.add('correcto');
+                    correctas++;
+                } else {
+                    caso.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Todas las transformaciones correctas</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Tienes ${correctas} de 3 correctas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">
+                        ${intentos >= 2 ? '<strong>Pista:</strong> String::toUpperCase convierte a mayúsculas, String::length obtiene la longitud' : 'Lee los ejemplos cuidadosamente'}
+                    </div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const slots = document.querySelectorAll('.slot-transformacion');
+            const banco = document.getElementById('banco');
+            
+            slots.forEach(slot => {
+                const transformacion = slot.querySelector('.transformacion-pieza');
+                if (transformacion) {
+                    banco.appendChild(transformacion);
+                }
+            });
+            
+            document.querySelectorAll('.caso-transformacion').forEach(caso => {
+                caso.classList.remove('correcto', 'incorrecto');
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

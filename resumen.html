@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen Final</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card resumen-container">
+            <h1 class="resumen-titulo">🎉 ¡Felicidades!</h1>
+            
+            <div id="equipo-nombre" class="equipo-info">
+            </div>
+
+            <h2 style="font-size: 28px; color: #333; margin: 30px 0; text-align: center;">Has completado el curso de Java Streams</h2>
+
+            <div class="resumen-puntos-badges">
+                <div class="resumen-puntos-card">
+                    <div class="puntos-icono">🏆</div>
+                    <div class="puntos-valor" id="puntos-totales">0</div>
+                    <div class="puntos-label">Puntos Totales</div>
+                </div>
+                <div class="resumen-badges-card">
+                    <div class="badges-icono">🎖️</div>
+                    <div class="badges-valor" id="badges-totales">0</div>
+                    <div class="badges-label">Badges Conseguidos</div>
+                </div>
+            </div>
+
+            <div class="badges-obtenidos" id="badges-obtenidos">
+            </div>
+
+            <div class="resumen-tiempo" id="tiempo-total">
+            </div>
+
+            <div class="resumen-estadisticas">
+                <h3>📊 Estadísticas por Fase</h3>
+                
+                <div class="fases-estadisticas">
+                    <div class="fase-stat">
+                        <h4>Fase 1: Fundamentos</h4>
+                        <div id="stats-fase1"></div>
+                    </div>
+                    <div class="fase-stat">
+                        <h4>Fase 2: Operaciones Intermedias</h4>
+                        <div id="stats-fase2"></div>
+                    </div>
+                    <div class="fase-stat">
+                        <h4>Fase 3: Operaciones Terminales</h4>
+                        <div id="stats-fase3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resumen-conceptos">
+                <h3>💡 Conceptos Aprendidos</h3>
+                <div class="conceptos-grid">
+                    <div class="concepto-card">
+                        <h4>🌊 Fundamentos de Streams</h4>
+                        <ul>
+                            <li>Qué son los Streams</li>
+                            <li>Creación de Streams</li>
+                            <li>Operaciones Intermedias vs Terminales</li>
+                        </ul>
+                    </div>
+                    <div class="concepto-card">
+                        <h4>🔄 Operaciones Intermedias</h4>
+                        <ul>
+                            <li>filter() - Filtrar elementos</li>
+                            <li>map() - Transformar elementos</li>
+                            <li>distinct() - Eliminar duplicados</li>
+                            <li>sorted() - Ordenar</li>
+                            <li>limit() / skip() - Limitar elementos</li>
+                        </ul>
+                    </div>
+                    <div class="concepto-card">
+                        <h4>🎯 Operaciones Terminales</h4>
+                        <ul>
+                            <li>collect() - Recolectar en colecciones</li>
+                            <li>count() - Contar elementos</li>
+                            <li>anyMatch() / allMatch() - Verificar</li>
+                            <li>findFirst() / findAny() - Buscar</li>
+                            <li>min() / max() - Extremos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; text-align: center;">
+                <button class="btn-primary" onclick="volverInicio()">🏠 Volver al inicio</button>
+                <button class="btn-secondary" onclick="reiniciarProgreso()">↻ Reiniciar todo</button>
+            </div>
+
+            <div class="mensaje-final">
+                <p>
+                    ¡Excelente trabajo! Has dominado los fundamentos de Java Streams.
+                    Ahora estás listo para aplicar estos conocimientos en proyectos reales.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (!verificarEquipo()) {
+            window.location.href = 'index.html';
+        }
+
+        crearHeader();
+
+        const progreso = getProgreso();
+        
+        const equipoNombre = document.getElementById('equipo-nombre');
+        const equipoClass = `equipo-${progreso.equipo}`;
+        const equipoEmoji = {
+            'A': '🔴',
+            'B': '🔵',
+            'C': '🟢',
+            'D': '🟡'
+        }[progreso.equipo] || '';
+        equipoNombre.className = `equipo-info ${equipoClass}`;
+        equipoNombre.textContent = `${equipoEmoji} Equipo ${progreso.equipo}`;
+
+        const puntosTotales = getPuntosTotales();
+        document.getElementById('puntos-totales').textContent = puntosTotales;
+
+        const badges = progreso.badges || [];
+        document.getElementById('badges-totales').textContent = badges.length;
+
+        if (badges.length > 0) {
+            const badgesDiv = document.getElementById('badges-obtenidos');
+            badgesDiv.innerHTML = '<h3>🎖️ Tus Badges</h3><div class="badges-grid">';
+            
+            badges.forEach(badgeId => {
+                const badge = BADGES[badgeId];
+                if (badge) {
+                    badgesDiv.innerHTML += `
+                        <div class="badge-resumen">
+                            <div class="badge-emoji">${badge.emoji}</div>
+                            <div class="badge-nombre">${badge.nombre}</div>
+                            <div class="badge-desc">${badge.descripcion}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            badgesDiv.innerHTML += '</div>';
+        }
+
+        const tiempoTotal = Date.now() - progreso.startTime;
+        document.getElementById('tiempo-total').innerHTML = `
+            <div class="tiempo-card">
+                <div class="tiempo-icono">⏱️</div>
+                <div class="tiempo-valor">${formatearTiempo(tiempoTotal)}</div>
+                <div class="tiempo-label">Tiempo Total</div>
+            </div>
+        `;
+
+        const fases = {
+            'fase1': ['actividad1-1', 'actividad1-2', 'actividad1-3', 'actividad1-4'],
+            'fase2': ['actividad2-1', 'actividad2-2', 'actividad2-3'],
+            'fase3': ['actividad3-1', 'actividad3-2']
+        };
+
+        Object.keys(fases).forEach(faseId => {
+            const actividades = fases[faseId];
+            let totalIntentos = 0;
+            let actividadesCompletadas = 0;
+            let actividadesPerfectas = 0;
+
+            actividades.forEach(actId => {
+                const intentos = progreso.intentosPorActividad[actId] || 0;
+                if (intentos > 0) {
+                    actividadesCompletadas++;
+                    totalIntentos += intentos;
+                    if (intentos === 1) actividadesPerfectas++;
+                }
+            });
+
+            const statsDiv = document.getElementById(`stats-${faseId}`);
+            statsDiv.innerHTML = `
+                <div class="stat-item">
+                    <span class="stat-label">Actividades completadas:</span>
+                    <span class="stat-valor">${actividadesCompletadas}/${actividades.length}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Intentos totales:</span>
+                    <span class="stat-valor">${totalIntentos}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Perfectas (1 intento):</span>
+                    <span class="stat-valor">${actividadesPerfectas}</span>
+                </div>
+            `;
+        });
+
+        function volverInicio() {
+            window.location.href = 'index.html';
+        }
+
+        function reiniciarProgreso() {
+            if (confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('streamProgress');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

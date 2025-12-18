@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 3.1 - Operaciones Terminales</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🎯 Fase 3: Operaciones Terminales</h1>
+
+            <div class="teoria-seccion">
+                <h2>¿Qué son las Operaciones Terminales?</h2>
+                <p>Las operaciones terminales son aquellas que <strong>finalizan el Stream</strong> y producen un resultado final. 
+                Una vez ejecutada una operación terminal, el Stream se consume y no puede ser reutilizado.</p>
+                
+                <div class="caracteristicas-box">
+                    <h3>✨ Características principales:</h3>
+                    <ul>
+                        <li>🏁 <strong>Finalizan el Stream:</strong> Después de ejecutarse, el Stream no puede usarse más</li>
+                        <li>⚡ <strong>Activan la ejecución:</strong> Las operaciones intermedias no se ejecutan hasta que hay una terminal</li>
+                        <li>📦 <strong>Producen resultado:</strong> Devuelven un valor, colección, o ejecutan una acción</li>
+                        <li>🚫 <strong>No encadenables:</strong> No puedes aplicar más operaciones después</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>📋 Operaciones Terminales Principales</h2>
+                
+                <div class="operacion-detalle">
+                    <h3>1. collect() - Recolectar en colección</h3>
+                    <p>Acumula los elementos del Stream en una colección (List, Set, Map, etc.).</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Recolectar en List
+List<String> lista = stream.collect(Collectors.toList());
+
+// Recolectar en Set
+Set<Integer> conjunto = stream.collect(Collectors.toSet());
+
+// Unir en String
+String texto = stream.collect(Collectors.joining(", "));</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>2. count() - Contar elementos</h3>
+                    <p>Devuelve el número de elementos en el Stream.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>long cantidad = Stream.of(1, 2, 3, 4, 5)
+    .filter(n -> n > 2)
+    .count();  // Resultado: 3</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>3. forEach() - Ejecutar acción</h3>
+                    <p>Ejecuta una acción para cada elemento del Stream.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Stream.of("A", "B", "C")
+    .forEach(System.out::println);
+// Imprime: A, B, C (cada uno en una línea)</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria3-2.html')">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria3-1.html');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 3.1 - Elegir Operación Terminal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🎯 Actividad 3.1: Elegir la Operación Terminal</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Para cada situación, arrastra la operación terminal correcta.</p>
+            </div>
+
+            <div class="situaciones-container">
+                <div class="situacion-item">
+                    <div class="situacion-descripcion">
+                        <strong>Situación 1:</strong> Necesito obtener una lista con todos los elementos filtrados
+                    </div>
+                    <div class="situacion-slot" data-correcto="collect"></div>
+                </div>
+
+                <div class="situacion-item">
+                    <div class="situacion-descripcion">
+                        <strong>Situación 2:</strong> Quiero saber cuántos elementos cumplen la condición
+                    </div>
+                    <div class="situacion-slot" data-correcto="count"></div>
+                </div>
+
+                <div class="situacion-item">
+                    <div class="situacion-descripcion">
+                        <strong>Situación 3:</strong> Necesito verificar si al menos uno cumple la condición
+                    </div>
+                    <div class="situacion-slot" data-correcto="anyMatch"></div>
+                </div>
+
+                <div class="situacion-item">
+                    <div class="situacion-descripcion">
+                        <strong>Situación 4:</strong> Quiero encontrar el elemento con el valor máximo
+                    </div>
+                    <div class="situacion-slot" data-correcto="max"></div>
+                </div>
+
+                <div class="operaciones-terminales-banco" id="banco">
+                    <div class="operacion-terminal-pieza" draggable="true" data-id="collect">collect(Collectors.toList())</div>
+                    <div class="operacion-terminal-pieza" draggable="true" data-id="count">count()</div>
+                    <div class="operacion-terminal-pieza" draggable="true" data-id="anyMatch">anyMatch()</div>
+                    <div class="operacion-terminal-pieza" draggable="true" data-id="max">max()</div>
+                    <div class="operacion-terminal-pieza" draggable="true" data-id="forEach">forEach()</div>
+                    <div class="operacion-terminal-pieza" draggable="true" data-id="findFirst">findFirst()</div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad3-2.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad3-1';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad3-1.html');
+            shuffleOperaciones();
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shuffleOperaciones() {
+            const banco = document.getElementById('banco');
+            const operaciones = Array.from(banco.children);
+
+            for (let i = operaciones.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [operaciones[i], operaciones[j]] = [operaciones[j], operaciones[i]];
+            }
+
+            operaciones.forEach(op => banco.appendChild(op));
+        }
+
+        function configurarDragDrop() {
+            const operaciones = document.querySelectorAll('.operacion-terminal-pieza');
+            const slots = document.querySelectorAll('.situacion-slot');
+            
+            operaciones.forEach(op => {
+                op.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('operacion', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                });
+                
+                op.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const opId = e.dataTransfer.getData('operacion');
+                    const opElement = document.querySelector(`[data-id="${opId}"]`);
+                    
+                    const existente = slot.querySelector('.operacion-terminal-pieza');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(opElement);
+                });
+            });
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const situaciones = document.querySelectorAll('.situacion-item');
+            let todoCorrecto = true;
+            let correctas = 0;
+            
+            situaciones.forEach(situacion => {
+                const slot = situacion.querySelector('.situacion-slot');
+                const correcto = slot.dataset.correcto;
+                const operacion = slot.querySelector('.operacion-terminal-pieza');
+                
+                situacion.classList.remove('correcto', 'incorrecto');
+                
+                if (operacion && operacion.dataset.id === correcto) {
+                    situacion.classList.add('correcto');
+                    correctas++;
+                } else {
+                    situacion.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Excelente! ✓ Todas las operaciones terminales correctas</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Tienes ${correctas} de 4 correctas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">
+                        ${intentos >= 2 ? '<strong>Pista:</strong> collect() recolecta, count() cuenta, anyMatch() verifica, max() encuentra máximo' : 'Piensa en qué hace cada operación'}
+                    </div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const slots = document.querySelectorAll('.situacion-slot');
+            const banco = document.getElementById('banco');
+            
+            slots.forEach(slot => {
+                const operacion = slot.querySelector('.operacion-terminal-pieza');
+                if (operacion) {
+                    banco.appendChild(operacion);
+                }
+            });
+            
+            document.querySelectorAll('.situacion-item').forEach(situacion => {
+                situacion.classList.remove('correcto', 'incorrecto');
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

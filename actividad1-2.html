@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 1.2 - Matching de Conceptos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🎯 Actividad 1.2: Emparejar Operaciones</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Conecta cada operación con su descripción correcta.</p>
+                <p>👉 Arrastra cada operación sobre su descripción correspondiente.</p>
+            </div>
+
+            <div class="matching-container">
+                <div class="matching-operaciones" id="operaciones-banco">
+                    <div class="operacion-pieza" draggable="true" data-id="filter">filter()</div>
+                    <div class="operacion-pieza" draggable="true" data-id="map">map()</div>
+                    <div class="operacion-pieza" draggable="true" data-id="collect">collect()</div>
+                    <div class="operacion-pieza" draggable="true" data-id="forEach">forEach()</div>
+                    <div class="operacion-pieza" draggable="true" data-id="sorted">sorted()</div>
+                    <div class="operacion-pieza" draggable="true" data-id="count">count()</div>
+                </div>
+
+                <div class="matching-descripciones">
+                    <div class="descripcion-slot" data-correcto="filter">
+                        <div class="descripcion-texto">Selecciona elementos que cumplen una condición</div>
+                        <div class="slot-drop"></div>
+                    </div>
+                    <div class="descripcion-slot" data-correcto="map">
+                        <div class="descripcion-texto">Transforma cada elemento aplicando una función</div>
+                        <div class="slot-drop"></div>
+                    </div>
+                    <div class="descripcion-slot" data-correcto="sorted">
+                        <div class="descripcion-texto">Ordena los elementos del Stream</div>
+                        <div class="slot-drop"></div>
+                    </div>
+                    <div class="descripcion-slot" data-correcto="collect">
+                        <div class="descripcion-texto">Recolecta los elementos en una colección</div>
+                        <div class="slot-drop"></div>
+                    </div>
+                    <div class="descripcion-slot" data-correcto="forEach">
+                        <div class="descripcion-texto">Ejecuta una acción para cada elemento</div>
+                        <div class="slot-drop"></div>
+                    </div>
+                    <div class="descripcion-slot" data-correcto="count">
+                        <div class="descripcion-texto">Cuenta el número de elementos</div>
+                        <div class="slot-drop"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad1-3.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad1-2';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad1-2.html');
+            shuffleOperaciones();
+            configurarMatching();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shuffleOperaciones() {
+            const banco = document.getElementById('operaciones-banco');
+            const operaciones = Array.from(banco.children);
+
+            // Algoritmo Fisher-Yates para mezclar
+            for (let i = operaciones.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [operaciones[i], operaciones[j]] = [operaciones[j], operaciones[i]];
+            }
+
+            // Reordenar en el DOM
+            operaciones.forEach(op => banco.appendChild(op));
+        }
+
+        function configurarMatching() {
+            const operaciones = document.querySelectorAll('.operacion-pieza');
+            const slots = document.querySelectorAll('.slot-drop');
+            
+            operaciones.forEach(op => {
+                op.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('operacion', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                });
+                
+                op.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const operacionId = e.dataTransfer.getData('operacion');
+                    const operacionElement = document.querySelector(`[data-id="${operacionId}"]`);
+                    
+                    const existente = slot.querySelector('.operacion-pieza');
+                    if (existente) {
+                        document.getElementById('operaciones-banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(operacionElement);
+                });
+            });
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const descripciones = document.querySelectorAll('.descripcion-slot');
+            let todoCorrecto = true;
+            let correctas = 0;
+            
+            descripciones.forEach(desc => {
+                const correcto = desc.dataset.correcto;
+                const slot = desc.querySelector('.slot-drop');
+                const operacion = slot.querySelector('.operacion-pieza');
+                
+                desc.classList.remove('correcto', 'incorrecto');
+                
+                if (operacion && operacion.dataset.id === correcto) {
+                    desc.classList.add('correcto');
+                    correctas++;
+                } else {
+                    desc.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Excelente! ✓ Todas las operaciones emparejadas correctamente</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Tienes ${correctas} de 6 correctas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">
+                        ${intentos >= 3 ? '<strong>Pista:</strong> filter selecciona, map transforma, sorted ordena' : 'Revisa las descripciones cuidadosamente'}
+                    </div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const descripciones = document.querySelectorAll('.descripcion-slot');
+            const banco = document.getElementById('operaciones-banco');
+            
+            descripciones.forEach(desc => {
+                const slot = desc.querySelector('.slot-drop');
+                const operacion = slot.querySelector('.operacion-pieza');
+                if (operacion) {
+                    banco.appendChild(operacion);
+                }
+                desc.classList.remove('correcto', 'incorrecto');
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

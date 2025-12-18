@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Badge Modal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 600px;">
+            <h1 style="color: #333; margin-bottom: 20px;">🏆 Test de Modal de Badges</h1>
+            <p style="margin: 20px 0; color: #666;">Haz clic en los botones para probar los diferentes badges:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <button onclick="testBadge('primera_sangre')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    🎯 Primera Sangre
+                </button>
+                <button onclick="testBadge('velocista')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    ⚡ Velocista
+                </button>
+                <button onclick="testBadge('pensador_fase1')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    🧠 Pensador Fase 1
+                </button>
+                <button onclick="testBadge('pensador_fase2')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    🧠 Pensador Fase 2
+                </button>
+                <button onclick="testBadge('racha_perfecta')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    🔥 Racha Perfecta
+                </button>
+                <button onclick="testBadge('maestro_streams')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    🏆 Maestro Streams
+                </button>
+                <button onclick="testBadge('graduado')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    🎓 Graduado
+                </button>
+                <button onclick="testBadge('rapido')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                    ⏱️ Rápido
+                </button>
+            </div>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #eee;">
+
+            <button onclick="limpiarStorage()" style="padding: 15px 30px; font-size: 16px; cursor: pointer; border-radius: 10px; border: 2px solid #f44336; background: white; color: #f44336; font-weight: bold;">
+                🗑️ Limpiar LocalStorage
+            </button>
+            <p style="margin-top: 10px; font-size: 14px; color: #999;">
+                Limpia el localStorage para poder volver a ganar badges en las actividades
+            </p>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #eee;">
+
+            <a href="index.html" style="display: inline-block; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;">
+                ← Volver al Inicio
+            </a>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        function testBadge(badgeId) {
+            console.log('Testing badge:', badgeId);
+            mostrarNotificacionBadge(badgeId);
+        }
+
+        function limpiarStorage() {
+            if (confirm('¿Estás seguro de que quieres limpiar todo el progreso?')) {
+                localStorage.clear();
+                alert('✓ LocalStorage limpiado. Ahora puedes volver a ganar badges en las actividades.');
+            }
+        }
+    </script>
+</body>
+</html>

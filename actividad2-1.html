@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 2.1 - Maestro del Filter</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🎯 Actividad 2.1: Maestro del Filter</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Arrastra los predicados correctos para filtrar los datos según cada criterio.</p>
+            </div>
+
+            <div class="filtro-ejercicio">
+                <div class="datos-mostrar">
+                    <h3>📊 Datos: [10, 25, 30, 15, 40, 5, 35]</h3>
+                </div>
+
+                <div class="filtros-grid">
+                    <div class="filtro-item">
+                        <div class="filtro-objetivo">
+                            <strong>Objetivo:</strong> Números mayores que 20
+                        </div>
+                        <div class="filtro-slot" data-correcto="mayor20" data-resultado="[25, 30, 40, 35]"></div>
+                    </div>
+
+                    <div class="filtro-item">
+                        <div class="filtro-objetivo">
+                            <strong>Objetivo:</strong> Números pares
+                        </div>
+                        <div class="filtro-slot" data-correcto="pares" data-resultado="[10, 30, 40]"></div>
+                    </div>
+
+                    <div class="filtro-item">
+                        <div class="filtro-objetivo">
+                            <strong>Objetivo:</strong> Números entre 10 y 30
+                        </div>
+                        <div class="filtro-slot" data-correcto="rango" data-resultado="[10, 25, 30, 15]"></div>
+                    </div>
+                </div>
+
+                <div class="predicados-banco" id="banco">
+                    <div class="predicado-pieza" draggable="true" data-id="mayor20">n -> n > 20</div>
+                    <div class="predicado-pieza" draggable="true" data-id="pares">n -> n % 2 == 0</div>
+                    <div class="predicado-pieza" draggable="true" data-id="rango">n -> n >= 10 && n <= 30</div>
+                    <div class="predicado-pieza" draggable="true" data-id="menor15">n -> n < 15</div>
+                    <div class="predicado-pieza" draggable="true" data-id="impares">n -> n % 2 != 0</div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad2-2.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad2-1';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad2-1.html');
+            shufflePredicados();
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shufflePredicados() {
+            const banco = document.getElementById('banco');
+            const predicados = Array.from(banco.children);
+
+            for (let i = predicados.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [predicados[i], predicados[j]] = [predicados[j], predicados[i]];
+            }
+
+            predicados.forEach(pred => banco.appendChild(pred));
+        }
+
+        function configurarDragDrop() {
+            const predicados = document.querySelectorAll('.predicado-pieza');
+            const slots = document.querySelectorAll('.filtro-slot');
+            
+            predicados.forEach(pred => {
+                pred.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('predicado', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                });
+                
+                pred.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const predicadoId = e.dataTransfer.getData('predicado');
+                    const predicadoElement = document.querySelector(`[data-id="${predicadoId}"]`);
+                    
+                    const existente = slot.querySelector('.predicado-pieza');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(predicadoElement);
+                });
+            });
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const slots = document.querySelectorAll('.filtro-slot');
+            let todoCorrecto = true;
+            let correctas = 0;
+            
+            slots.forEach(slot => {
+                const correcto = slot.dataset.correcto;
+                const predicado = slot.querySelector('.predicado-pieza');
+                
+                slot.classList.remove('correcto', 'incorrecto');
+                
+                if (predicado && predicado.dataset.id === correcto) {
+                    slot.classList.add('correcto');
+                    const resultado = slot.dataset.resultado;
+                    const resultadoDiv = document.createElement('div');
+                    resultadoDiv.className = 'resultado-filtro';
+                    resultadoDiv.textContent = `✓ Resultado: ${resultado}`;
+                    
+                    const existente = slot.querySelector('.resultado-filtro');
+                    if (existente) existente.remove();
+                    slot.appendChild(resultadoDiv);
+                    correctas++;
+                } else {
+                    slot.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Excelente! ✓ Todos los filtros aplicados correctamente</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Tienes ${correctas} de 3 correctas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">
+                        ${intentos >= 2 ? '<strong>Pista:</strong> Lee cuidadosamente cada objetivo y piensa qué condición lo cumple' : 'Revisa los predicados'}
+                    </div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const slots = document.querySelectorAll('.filtro-slot');
+            const banco = document.getElementById('banco');
+            
+            slots.forEach(slot => {
+                const predicado = slot.querySelector('.predicado-pieza');
+                if (predicado) {
+                    banco.appendChild(predicado);
+                }
+                slot.classList.remove('correcto', 'incorrecto');
+                const resultado = slot.querySelector('.resultado-filtro');
+                if (resultado) resultado.remove();
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

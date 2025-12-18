@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 3.2 - Completar el Pipeline</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🔨 Actividad 3.2: Completar el Pipeline</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Completa cada pipeline arrastrando la operación terminal correcta.</p>
+            </div>
+
+            <div class="pipelines-container">
+                <div class="pipeline-item">
+                    <div class="pipeline-objetivo">
+                        <strong>Objetivo:</strong> Obtener lista de nombres en mayúsculas
+                    </div>
+                    <div class="pipeline-codigo">
+                        <code>nombres.stream().map(String::toUpperCase)</code>
+                        <div class="pipeline-slot" data-correcto="toList"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-objetivo">
+                        <strong>Objetivo:</strong> Verificar si todos son mayores de edad
+                    </div>
+                    <div class="pipeline-codigo">
+                        <code>personas.stream()</code>
+                        <div class="pipeline-slot" data-correcto="allMatch"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-objetivo">
+                        <strong>Objetivo:</strong> Imprimir cada elemento
+                    </div>
+                    <div class="pipeline-codigo">
+                        <code>lista.stream().filter(n -> n > 0)</code>
+                        <div class="pipeline-slot" data-correcto="forEach"></div>
+                    </div>
+                </div>
+
+                <div class="operaciones-pipeline-banco" id="banco">
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="toList">.collect(Collectors.toList())</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="allMatch">.allMatch(p -> p.getEdad() >= 18)</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="forEach">.forEach(System.out::println)</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="count">.count()</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="findFirst">.findFirst()</div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('resumen.html')">Ver Resumen Final →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad3-2';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad3-2.html');
+            shuffleOperaciones();
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shuffleOperaciones() {
+            const banco = document.getElementById('banco');
+            const operaciones = Array.from(banco.children);
+
+            for (let i = operaciones.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [operaciones[i], operaciones[j]] = [operaciones[j], operaciones[i]];
+            }
+
+            operaciones.forEach(op => banco.appendChild(op));
+        }
+
+        function configurarDragDrop() {
+            const operaciones = document.querySelectorAll('.operacion-pipeline-pieza');
+            const slots = document.querySelectorAll('.pipeline-slot');
+            
+            operaciones.forEach(op => {
+                op.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('operacion', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                });
+                
+                op.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const opId = e.dataTransfer.getData('operacion');
+                    const opElement = document.querySelector(`[data-id="${opId}"]`);
+                    
+                    const existente = slot.querySelector('.operacion-pipeline-pieza');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(opElement);
+                });
+            });
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const pipelines = document.querySelectorAll('.pipeline-item');
+            let todoCorrecto = true;
+            let correctas = 0;
+            
+            pipelines.forEach(pipeline => {
+                const slot = pipeline.querySelector('.pipeline-slot');
+                const correcto = slot.dataset.correcto;
+                const operacion = slot.querySelector('.operacion-pipeline-pieza');
+                
+                pipeline.classList.remove('correcto', 'incorrecto');
+                
+                if (operacion && operacion.dataset.id === correcto) {
+                    pipeline.classList.add('correcto');
+                    correctas++;
+                } else {
+                    pipeline.classList.add('incorrecto');
+                    todoCorrecto = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Todos los pipelines completados correctamente</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Tienes ${correctas} de 3 correctas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">
+                        ${intentos >= 2 ? '<strong>Pista:</strong> Para obtener lista usa collect(toList()), para verificar todos usa allMatch(), para imprimir usa forEach()' : 'Lee el objetivo de cada pipeline'}
+                    </div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const slots = document.querySelectorAll('.pipeline-slot');
+            const banco = document.getElementById('banco');
+            
+            slots.forEach(slot => {
+                const operacion = slot.querySelector('.operacion-pipeline-pieza');
+                if (operacion) {
+                    banco.appendChild(operacion);
+                }
+            });
+            
+            document.querySelectorAll('.pipeline-item').forEach(pipeline => {
+                pipeline.classList.remove('correcto', 'incorrecto');
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Streams - Clase Interactiva</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="inicio-body">
+    <div class="container-inicio">
+        <div class="card-inicio">
+            <h1>☕ Java Streams</h1>
+            <h2>Clase Interactiva</h2>
+            
+            <div class="descripcion">
+                <p>Bienvenidos a esta clase interactiva sobre Streams en Java.</p>
+                <p>Aprenderás de forma práctica y visual cómo trabajar con Streams.</p>
+            </div>
+
+            <div class="seleccion-equipo">
+                <label for="equipo-select">Selecciona tu equipo:</label>
+                <select id="equipo-select">
+                    <option value="">-- Elige un equipo --</option>
+                    <option value="A">🔴 Equipo A</option>
+                    <option value="B">🔵 Equipo B</option>
+                    <option value="C">🟢 Equipo C</option>
+                    <option value="D">🟡 Equipo D</option>
+                </select>
+            </div>
+
+            <div class="opciones-inicio">
+                <button id="btn-comenzar" class="btn-primary" disabled>Comenzar</button>
+                <button id="btn-continuar" class="btn-secondary" style="display: none;">Continuar donde lo dejé</button>
+            </div>
+
+            <div class="info-contenido">
+                <h3>📚 Contenido de esta sesión:</h3>
+                <ul>
+                    <li>✓ Operaciones Intermedias (filter, map, sorted...)</li>
+                    <li>✓ Actividades prácticas interactivas</li>
+                    <li>✓ Feedback inmediato</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const equipoSelect = document.getElementById('equipo-select');
+        const btnComenzar = document.getElementById('btn-comenzar');
+        const btnContinuar = document.getElementById('btn-continuar');
+
+        // Verificar si hay progreso guardado
+        const progresoGuardado = localStorage.getItem('streamProgress');
+        
+        if (progresoGuardado) {
+            const progreso = JSON.parse(progresoGuardado);
+            btnContinuar.style.display = 'inline-block';
+            equipoSelect.value = progreso.equipo;
+            btnComenzar.disabled = false;
+            
+            btnContinuar.addEventListener('click', () => {
+                // Continuar donde lo dejó
+                window.location.href = progreso.ultimaPagina || 'teoria1.html';
+            });
+        }
+
+        equipoSelect.addEventListener('change', (e) => {
+            btnComenzar.disabled = !e.target.value;
+        });
+
+        btnComenzar.addEventListener('click', () => {
+            const equipo = equipoSelect.value;
+            if (!equipo) return;
+
+            // Inicializar progreso
+            const progreso = {
+                equipo: equipo,
+                startTime: Date.now(),
+                actividadesCompletadas: [],
+                intentosPorActividad: {},
+                ultimaPagina: 'teoria1-1.html',
+                puntos: 0,
+                badges: []
+            };
+
+            localStorage.setItem('streamProgress', JSON.stringify(progreso));
+            window.location.href = 'teoria1-1.html';
+        });
+    </script>
+</body>
+</html>
