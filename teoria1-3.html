@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 1 - Operaciones Intermedias vs Terminales</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="teoria-titulo">⚙️ Operaciones Intermedias vs Terminales</h1>
+            
+            <div class="teoria-seccion">
+                <h3>Anatomía de un Pipeline de Stream</h3>
+                <p>
+                    Un pipeline de Stream tiene tres partes:
+                </p>
+                <ul>
+                    <li><strong>Fuente:</strong> De dónde vienen los datos (List, Array, etc.)</li>
+                    <li><strong>Operaciones Intermedias:</strong> Transforman el Stream (pueden ser 0 o más)</li>
+                    <li><strong>Operación Terminal:</strong> Produce un resultado y cierra el Stream (solo 1)</li>
+                </ul>
+            </div>
+
+            <div class="codigo-ejemplo">
+                <pre>List<Integer> numeros = List.of(1, 2, 3, 4, 5, 6);
+
+int resultado = numeros<span class="highlight">.stream()</span>              // FUENTE
+    <span class="highlight">.filter(n -> n % 2 == 0)</span>    // INTERMEDIA
+    <span class="highlight">.map(n -> n * n)</span>            // INTERMEDIA
+    <span class="highlight">.sum()</span>;                     // TERMINAL
+
+// Resultado: 56 (4 + 16 + 36)</pre>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>🔹 Operaciones Intermedias</h3>
+                <p>
+                    Las operaciones intermedias <strong>transforman un Stream en otro Stream</strong>.
+                    Son <strong>lazy</strong> (perezosas): no se ejecutan hasta que hay una operación terminal.
+                </p>
+                
+                <div class="comparacion">
+                    <div class="comparacion-item">
+                        <h4>Características</h4>
+                        <p>✓ Devuelven un Stream</p>
+                        <p>✓ Se pueden encadenar</p>
+                        <p>✓ No producen resultado final</p>
+                        <p>✓ Ejecución lazy (perezosa)</p>
+                    </div>
+                    <div class="comparacion-item">
+                        <h4>Ejemplos comunes</h4>
+                        <p>• filter() - Filtrar elementos</p>
+                        <p>• map() - Transformar elementos</p>
+                        <p>• sorted() - Ordenar</p>
+                        <p>• distinct() - Eliminar duplicados</p>
+                        <p>• limit() - Limitar cantidad</p>
+                        <p>• skip() - Saltar elementos</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>🔸 Operaciones Terminales</h3>
+                <p>
+                    Las operaciones terminales <strong>producen un resultado o efecto secundario</strong>.
+                    Inician la ejecución del pipeline y <strong>consumen el Stream</strong>.
+                </p>
+                
+                <div class="comparacion">
+                    <div class="comparacion-item">
+                        <h4>Características</h4>
+                        <p>✓ Producen un resultado final</p>
+                        <p>✓ Cierran el Stream</p>
+                        <p>✓ Solo puede haber UNA</p>
+                        <p>✓ Inician la ejecución</p>
+                    </div>
+                    <div class="comparacion-item">
+                        <h4>Ejemplos comunes</h4>
+                        <p>• collect() - Recolectar en colección</p>
+                        <p>• forEach() - Ejecutar acción</p>
+                        <p>• count() - Contar elementos</p>
+                        <p>• sum() - Sumar (IntStream)</p>
+                        <p>• anyMatch() - Verificar condición</p>
+                        <p>• findFirst() - Encontrar primero</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>⚡ Lazy Evaluation (Evaluación Perezosa)</h3>
+                <p>
+                    Las operaciones intermedias NO se ejecutan inmediatamente. Solo se ejecutan cuando
+                    se invoca una operación terminal.
+                </p>
+                
+                <div class="codigo-ejemplo">
+                    <pre>Stream<String> stream = nombres.stream()
+    .filter(n -> {
+        System.out.println("Filtrando: " + n);
+        return n.length() > 3;
+    })
+    .map(n -> {
+        System.out.println("Mapeando: " + n);
+        return n.toUpperCase();
+    });
+
+// ⚠️ Hasta aquí NO se imprime nada
+// Las operaciones están "esperando"
+
+stream.collect(Collectors.toList());  // ✓ AHORA se ejecuta todo</pre>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>❌ Error común: Reutilizar un Stream</h3>
+                
+                <div class="codigo-ejemplo">
+                    <pre>Stream<Integer> numeros = Stream.of(1, 2, 3, 4, 5);
+
+long pares = numeros.filter(n -> n % 2 == 0).count();
+// Resultado: 2
+
+long impares = numeros.filter(n -> n % 2 != 0).count();
+// ❌ ERROR: IllegalStateException
+// El Stream ya fue consumido</pre>
+                </div>
+
+                <div class="nota-explicativa" style="background-color: #fff3e0; border-left-color: #ff9800;">
+                    <p><strong>⚠️ Importante:</strong></p>
+                    <p>
+                        Un Stream solo se puede usar UNA vez. Después de una operación terminal,
+                        el Stream queda cerrado y no se puede reutilizar.
+                    </p>
+                    <p>
+                        <strong>Solución:</strong> Crear un nuevo Stream cada vez que lo necesites.
+                    </p>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-anterior" onclick="navegarSiguiente('teoria1-2.html')">← Anterior</button>
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad1-1.html')">Siguiente: Actividades →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria1-3.html');
+        }
+    </script>
+</body>
+</html>

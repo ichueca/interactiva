@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 3.2 - Más Operaciones Terminales</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🎯 Más Operaciones Terminales</h1>
+
+            <div class="teoria-seccion">
+                <div class="operacion-detalle">
+                    <h3>4. anyMatch(), allMatch(), noneMatch() - Verificar condiciones</h3>
+                    <p>Verifican si alguno, todos o ninguno de los elementos cumplen una condición.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5);
+
+// ¿Alguno es mayor que 3?
+boolean algunoMayor = numeros.stream()
+    .anyMatch(n -> n > 3);  // true
+
+// ¿Todos son positivos?
+boolean todosPositivos = numeros.stream()
+    .allMatch(n -> n > 0);  // true
+
+// ¿Ninguno es negativo?
+boolean ningunNegativo = numeros.stream()
+    .noneMatch(n -> n < 0);  // true</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>5. findFirst(), findAny() - Buscar elementos</h3>
+                    <p>Encuentran un elemento del Stream. Devuelven un Optional.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Encontrar el primer elemento
+Optional<String> primero = Stream.of("A", "B", "C")
+    .findFirst();  // Optional["A"]
+
+// Encontrar cualquier elemento (útil en paralelo)
+Optional<Integer> cualquiera = Stream.of(1, 2, 3)
+    .findAny();  // Optional[1] (o cualquier otro)</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>6. min(), max() - Mínimo y máximo</h3>
+                    <p>Encuentran el elemento mínimo o máximo según un Comparator.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>List<Integer> numeros = Arrays.asList(5, 2, 8, 1, 9);
+
+// Encontrar el mínimo
+Optional<Integer> minimo = numeros.stream()
+    .min(Integer::compareTo);  // Optional[1]
+
+// Encontrar el máximo
+Optional<Integer> maximo = numeros.stream()
+    .max(Integer::compareTo);  // Optional[9]
+
+// Con Strings
+Optional<String> nombreMasLargo = nombres.stream()
+    .max(Comparator.comparing(String::length));</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria3-3.html')">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria3-2.html');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 2.1 - Operaciones Intermedias</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🔄 Fase 2: Operaciones Intermedias</h1>
+
+            <div class="teoria-seccion">
+                <h2>¿Qué son las Operaciones Intermedias?</h2>
+                <p>Las operaciones intermedias son aquellas que <strong>transforman un Stream en otro Stream</strong>. 
+                Son <strong>lazy</strong> (perezosas), lo que significa que no se ejecutan hasta que se invoca una operación terminal.</p>
+                
+                <div class="caracteristicas-box">
+                    <h3>✨ Características principales:</h3>
+                    <ul>
+                        <li>🔗 <strong>Encadenables:</strong> Puedes aplicar múltiples operaciones intermedias seguidas</li>
+                        <li>⏸️ <strong>Lazy:</strong> No se ejecutan hasta que hay una operación terminal</li>
+                        <li>🔄 <strong>Retornan Stream:</strong> Siempre devuelven un nuevo Stream</li>
+                        <li>🎯 <strong>No modifican la fuente:</strong> Los datos originales permanecen intactos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>📋 Operaciones Intermedias Principales</h2>
+                
+                <div class="operacion-detalle">
+                    <h3>1. filter() - Filtrar elementos</h3>
+                    <p>Selecciona solo los elementos que cumplen una condición (predicado).</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Stream.of(1, 2, 3, 4, 5)
+      .filter(n -> n > 2)  // Solo números mayores que 2
+      // Resultado: 3, 4, 5</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>2. map() - Transformar elementos</h3>
+                    <p>Aplica una función a cada elemento, transformándolo.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Stream.of("a", "b", "c")
+      .map(String::toUpperCase)  // Convierte a mayúsculas
+      // Resultado: "A", "B", "C"</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>3. distinct() - Eliminar duplicados</h3>
+                    <p>Elimina elementos duplicados del Stream.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Stream.of(1, 2, 2, 3, 3, 3)
+      .distinct()
+      // Resultado: 1, 2, 3</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria2-2.html')">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria2-1.html');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 1 - ¿Qué son los Streams?</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="teoria-titulo">📚 Fase 1: Fundamentos de Streams</h1>
+            
+            <div class="teoria-seccion">
+                <h3>¿Qué son los Streams?</h3>
+                <p>
+                    Los <strong>Streams</strong> en Java son una forma moderna y elegante de procesar colecciones de datos.
+                    Introducidos en Java 8, permiten escribir código más limpio, legible y funcional.
+                </p>
+                <p>
+                    Un Stream es una <strong>secuencia de elementos</strong> que soporta operaciones de procesamiento
+                    de datos de forma declarativa (dices QUÉ quieres hacer, no CÓMO hacerlo).
+                </p>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>Características principales:</h3>
+                <ul>
+                    <li><strong>No almacenan datos:</strong> Los Streams no son estructuras de datos, solo procesan datos de una fuente</li>
+                    <li><strong>Funcionales:</strong> Las operaciones no modifican la fuente original</li>
+                    <li><strong>Lazy (perezosos):</strong> Las operaciones intermedias no se ejecutan hasta que hay una operación terminal</li>
+                    <li><strong>Consumibles:</strong> Un Stream solo se puede usar una vez</li>
+                    <li><strong>Pueden ser infinitos:</strong> Pueden representar secuencias infinitas de datos</li>
+                </ul>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>Comparación: Antes vs Ahora</h3>
+                
+                <div class="codigo-ejemplo">
+                    <pre><strong>// Forma tradicional (imperativa)</strong>
+List<String> nombres = Arrays.asList("Ana", "Pedro", "Juan", "María");
+List<String> resultado = new ArrayList<>();
+
+for (String nombre : nombres) {
+    if (nombre.length() > 3) {
+        resultado.add(nombre.toUpperCase());
+    }
+}
+Collections.sort(resultado);
+
+// Resultado: ["JUAN", "MARÍA", "PEDRO"]</pre>
+                </div>
+
+                <div class="codigo-ejemplo">
+                    <pre><strong>// Con Streams (declarativa)</strong>
+List<String> nombres = Arrays.asList("Ana", "Pedro", "Juan", "María");
+
+List<String> resultado = nombres.stream()
+    <span class="highlight">.filter(n -> n.length() > 3)</span>
+    <span class="highlight">.map(String::toUpperCase)</span>
+    <span class="highlight">.sorted()</span>
+    <span class="highlight">.collect(Collectors.toList())</span>;
+
+// Resultado: ["JUAN", "MARÍA", "PEDRO"]</pre>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>Ventajas de usar Streams:</h3>
+                <ul>
+                    <li>✓ <strong>Código más legible:</strong> Se lee como una secuencia de transformaciones</li>
+                    <li>✓ <strong>Menos código:</strong> Elimina bucles y variables temporales</li>
+                    <li>✓ <strong>Menos errores:</strong> Menos código = menos bugs</li>
+                    <li>✓ <strong>Composición:</strong> Fácil combinar operaciones</li>
+                    <li>✓ <strong>Paralelización:</strong> Fácil convertir a procesamiento paralelo</li>
+                </ul>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria1-2.html')">Siguiente: Crear Streams →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria1-1.html');
+        }
+    </script>
+</body>
+</html>

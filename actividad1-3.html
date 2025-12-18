@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 1.3 - Construir un Stream</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🔨 Actividad 1.3: Construir un Stream</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Crea un Stream válido arrastrando las piezas en el orden correcto.</p>
+                <p>👉 Construye: <code>Stream.of(1,2,3).filter(n -> n > 1).collect(Collectors.toList())</code></p>
+            </div>
+
+            <div class="constructor-container">
+                <div class="piezas-banco" id="banco">
+                    <div class="pieza-codigo" draggable="true" data-id="stream">Stream.of(1,2,3)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="filter">.filter(n -> n > 1)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="map">.map(n -> n * 2)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="collect">.collect(Collectors.toList())</div>
+                    <div class="pieza-codigo" draggable="true" data-id="count">.count()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="sorted">.sorted()</div>
+                </div>
+
+                <div class="zona-construccion">
+                    <div class="construccion-titulo">🎯 Zona de Construcción</div>
+                    <div class="slots-construccion" id="slots">
+                        <div class="slot-construccion" data-posicion="0"></div>
+                        <div class="slot-construccion" data-posicion="1"></div>
+                        <div class="slot-construccion" data-posicion="2"></div>
+                    </div>
+                    <div class="codigo-resultado" id="codigo-resultado"></div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad1-4.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad1-3';
+        const SOLUCION = ['stream', 'filter', 'collect'];
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad1-3.html');
+            shufflePiezas();
+            configurarConstructor();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shufflePiezas() {
+            const banco = document.getElementById('banco');
+            const piezas = Array.from(banco.children);
+
+            // Algoritmo Fisher-Yates para mezclar
+            for (let i = piezas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [piezas[i], piezas[j]] = [piezas[j], piezas[i]];
+            }
+
+            // Reordenar en el DOM
+            piezas.forEach(pieza => banco.appendChild(pieza));
+        }
+
+        function configurarConstructor() {
+            const piezas = document.querySelectorAll('.pieza-codigo');
+            const slots = document.querySelectorAll('.slot-construccion');
+            
+            piezas.forEach(pieza => {
+                pieza.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('pieza', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                });
+                
+                pieza.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const piezaId = e.dataTransfer.getData('pieza');
+                    const piezaElement = document.querySelector(`[data-id="${piezaId}"]`);
+                    
+                    const existente = slot.querySelector('.pieza-codigo');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(piezaElement);
+                    actualizarCodigoResultado();
+                });
+            });
+        }
+
+        function actualizarCodigoResultado() {
+            const slots = document.querySelectorAll('.slot-construccion');
+            let codigo = '';
+            
+            slots.forEach(slot => {
+                const pieza = slot.querySelector('.pieza-codigo');
+                if (pieza) {
+                    codigo += pieza.textContent;
+                }
+            });
+            
+            document.getElementById('codigo-resultado').textContent = codigo || 'Arrastra las piezas aquí...';
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const slots = document.querySelectorAll('.slot-construccion');
+            const construccion = [];
+            
+            slots.forEach(slot => {
+                const pieza = slot.querySelector('.pieza-codigo');
+                if (pieza) {
+                    construccion.push(pieza.dataset.id);
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            
+            if (construccion.length !== SOLUCION.length) {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Faltan piezas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Necesitas exactamente 3 piezas en el orden correcto</div>
+                `;
+                return;
+            }
+            
+            const correcto = construccion.every((id, i) => id === SOLUCION[i]);
+            
+            if (correcto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Stream construido correctamente</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                let mensaje = 'El orden no es correcto';
+                if (intentos >= 2) {
+                    mensaje = '<strong>Pista:</strong> Primero crea el Stream, luego filtra, finalmente recolecta';
+                }
+                
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ ${mensaje} (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Recuerda: Creación → Operación Intermedia → Operación Terminal</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const slots = document.querySelectorAll('.slot-construccion');
+            const banco = document.getElementById('banco');
+            
+            slots.forEach(slot => {
+                const pieza = slot.querySelector('.pieza-codigo');
+                if (pieza) {
+                    banco.appendChild(pieza);
+                }
+            });
+            
+            actualizarCodigoResultado();
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

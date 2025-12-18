@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 3.3 - toArray y toList</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🎯 Convertir a Array y List</h1>
+
+            <div class="teoria-seccion">
+                <div class="operacion-detalle">
+                    <h3>7. toArray() - Convertir a Array</h3>
+                    <p>Convierte el Stream en un array.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Array de Object
+Object[] array1 = Stream.of(1, 2, 3)
+    .toArray();
+
+// Array tipado
+Integer[] array2 = Stream.of(1, 2, 3)
+    .toArray(Integer[]::new);
+
+// Con transformación
+String[] nombres = personas.stream()
+    .map(Persona::getNombre)
+    .toArray(String[]::new);</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>8. toList() - Convertir a List (Java 16+)</h3>
+                    <p>Forma simplificada de convertir a List inmutable.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Forma moderna (Java 16+)
+List<String> lista = Stream.of("A", "B", "C")
+    .toList();
+
+// Forma tradicional (compatible con versiones anteriores)
+List<String> lista = Stream.of("A", "B", "C")
+    .collect(Collectors.toList());</code></pre>
+                    </div>
+                    
+                    <div class="nota-explicativa">
+                        <strong>💡 Diferencia importante:</strong>
+                        <p><code>toList()</code> devuelve una lista <strong>inmutable</strong> (no se puede modificar).</p>
+                        <p><code>collect(Collectors.toList())</code> devuelve una lista <strong>mutable</strong> (se puede modificar).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>🔗 Ejemplo Completo</h2>
+                <p>Combinando operaciones intermedias y terminales:</p>
+                <div class="ejemplo-codigo">
+                    <pre><code>List<String> nombres = Arrays.asList("Ana", "Pedro", "Luis", "María", "Ana");
+
+// Pipeline completo
+List<String> resultado = nombres.stream()
+    .distinct()                    // Elimina duplicados
+    .filter(n -> n.length() > 3)   // Solo nombres con más de 3 letras
+    .map(String::toUpperCase)      // Convierte a mayúsculas
+    .sorted()                      // Ordena alfabéticamente
+    .collect(Collectors.toList()); // Recolecta en List
+
+// Resultado: ["LUIS", "MARÍA", "PEDRO"]
+
+// Verificaciones
+boolean hayLargos = nombres.stream()
+    .anyMatch(n -> n.length() > 5);  // true (María)
+
+long cantidad = nombres.stream()
+    .distinct()
+    .count();  // 4 (Ana, Pedro, Luis, María)</code></pre>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad3-1.html')">Comenzar Actividades →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria3-3.html');
+        }
+    </script>
+</body>
+</html>

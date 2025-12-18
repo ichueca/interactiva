@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 1.1 - Clasificar Operaciones</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🎯 Actividad 1.1: Clasificar Operaciones</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Clasifica cada operación según su tipo.</p>
+                <p>👉 Arrastra cada operación al contenedor correcto: <strong>Intermedia</strong> o <strong>Terminal</strong>.</p>
+                <br>
+                <p><strong>Recuerda:</strong></p>
+                <ul>
+                    <li><strong>Intermedias:</strong> Devuelven un Stream y se pueden encadenar</li>
+                    <li><strong>Terminales:</strong> Producen un resultado y cierran el Stream</li>
+                </ul>
+            </div>
+
+            <div class="banco-piezas" id="banco-piezas">
+                <div class="pieza-codigo" draggable="true" data-id="filter" data-tipo="intermedia">filter()</div>
+                <div class="pieza-codigo" draggable="true" data-id="map" data-tipo="intermedia">map()</div>
+                <div class="pieza-codigo" draggable="true" data-id="collect" data-tipo="terminal">collect()</div>
+                <div class="pieza-codigo" draggable="true" data-id="forEach" data-tipo="terminal">forEach()</div>
+                <div class="pieza-codigo" draggable="true" data-id="sorted" data-tipo="intermedia">sorted()</div>
+                <div class="pieza-codigo" draggable="true" data-id="count" data-tipo="terminal">count()</div>
+                <div class="pieza-codigo" draggable="true" data-id="distinct" data-tipo="intermedia">distinct()</div>
+                <div class="pieza-codigo" draggable="true" data-id="findFirst" data-tipo="terminal">findFirst()</div>
+            </div>
+
+            <div class="contenedores-clasificacion">
+                <div class="contenedor-drop" id="contenedor-intermedia" data-tipo="intermedia">
+                    <h3>🔹 Operaciones Intermedias</h3>
+                    <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                        Devuelven un Stream y se pueden encadenar
+                    </p>
+                </div>
+                <div class="contenedor-drop" id="contenedor-terminal" data-tipo="terminal">
+                    <h3>🔸 Operaciones Terminales</h3>
+                    <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                        Producen un resultado y cierran el Stream
+                    </p>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad1-2.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad1-1';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad1-1.html');
+            shufflePiezas();
+            configurarDragPiezas('#banco-piezas', '.contenedor-drop');
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shufflePiezas() {
+            const banco = document.getElementById('banco-piezas');
+            const piezas = Array.from(banco.children);
+
+            // Algoritmo Fisher-Yates para mezclar
+            for (let i = piezas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [piezas[i], piezas[j]] = [piezas[j], piezas[i]];
+            }
+
+            // Reordenar en el DOM
+            piezas.forEach(pieza => banco.appendChild(pieza));
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const contenedores = document.querySelectorAll('.contenedor-drop');
+            let todoCorrecto = true;
+            let errores = [];
+            
+            contenedores.forEach(contenedor => {
+                const tipoEsperado = contenedor.dataset.tipo;
+                const piezas = contenedor.querySelectorAll('.pieza-codigo');
+                
+                contenedor.classList.remove('correcto', 'incorrecto');
+                
+                let contenedorCorrecto = true;
+                piezas.forEach(pieza => {
+                    if (pieza.dataset.tipo !== tipoEsperado) {
+                        contenedorCorrecto = false;
+                        todoCorrecto = false;
+                        errores.push(`${pieza.dataset.id} está en el contenedor incorrecto`);
+                    }
+                });
+                
+                if (piezas.length > 0) {
+                    if (contenedorCorrecto) {
+                        contenedor.classList.add('correcto');
+                    } else {
+                        contenedor.classList.add('incorrecto');
+                    }
+                }
+            });
+
+            const piezasEnBanco = document.querySelectorAll('#banco-piezas .pieza-codigo');
+            if (piezasEnBanco.length > 0) {
+                todoCorrecto = false;
+                errores.push('Aún hay operaciones sin clasificar');
+            }
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Clasificación correcta</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        <strong>Intermedias:</strong> filter(), map(), sorted(), distinct() - devuelven Stream.<br>
+                        <strong>Terminales:</strong> collect(), forEach(), count(), findFirst() - producen resultado.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                let pista = '';
+                
+                if (intentos === 1) {
+                    pista = '<br><strong>Pista:</strong> ¿La operación devuelve un Stream o un resultado final?';
+                } else if (intentos === 2) {
+                    pista = '<br><strong>Pista:</strong> collect() y forEach() son terminales. filter() y map() son intermedias.';
+                } else {
+                    pista = '<br><strong>Solución:</strong> Intermedias: filter, map, sorted, distinct | Terminales: collect, forEach, count, findFirst';
+                }
+                
+                feedback.innerHTML = `
+                    <div>✗ Revisa la clasificación (Intento ${intentos})</div>
+                    <div class="feedback-detalle">${pista}</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const contenedores = document.querySelectorAll('.contenedor-drop');
+            const banco = document.getElementById('banco-piezas');
+            
+            contenedores.forEach(contenedor => {
+                const piezas = contenedor.querySelectorAll('.pieza-codigo');
+                piezas.forEach(pieza => {
+                    banco.appendChild(pieza);
+                });
+                contenedor.classList.remove('correcto', 'incorrecto');
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

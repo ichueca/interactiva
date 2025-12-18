@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 2.3 - Visualizador Interactivo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🎮 Visualizador de Operaciones</h1>
+
+            <div class="teoria-seccion">
+                <p>Experimenta cómo cada operación intermedia transforma el Stream. 
+                Selecciona una operación y observa el resultado (las operaciones se ejecutan sobre el resultado de la operación anterior):</p>
+            </div>
+
+            <div class="visualizador-container">
+                <div class="datos-origen">
+                    <h3>📥 Datos de Entrada</h3>
+                    <div class="datos-display" id="datos-entrada">
+                        [5, 2, 8, 2, 1, 9, 5, 3]
+                    </div>
+                </div>
+
+                <div class="operaciones-selector">
+                    <h3>🔧 Selecciona una Operación</h3>
+                    <div class="operaciones-grid">
+                        <button class="btn-operacion" onclick="aplicarOperacion('filter')">
+                            filter(n > 3)
+                        </button>
+                        <button class="btn-operacion" onclick="aplicarOperacion('map')">
+                            map(n * 2)
+                        </button>
+                        <button class="btn-operacion" onclick="aplicarOperacion('distinct')">
+                            distinct()
+                        </button>
+                        <button class="btn-operacion" onclick="aplicarOperacion('sorted')">
+                            sorted()
+                        </button>
+                        <button class="btn-operacion" onclick="aplicarOperacion('limit')">
+                            limit(4)
+                        </button>
+                        <button class="btn-operacion" onclick="aplicarOperacion('skip')">
+                            skip(3)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="datos-resultado">
+                    <h3>📤 Resultado</h3>
+                    <div class="datos-display" id="datos-salida">
+                        Selecciona una operación...
+                    </div>
+                    <div class="explicacion-operacion" id="explicacion"></div>
+                </div>
+
+                <button class="btn-reiniciar" onclick="reiniciarVisualizador()">↻ Reiniciar</button>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad2-1.html')">Comenzar Actividades →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria2-3.html');
+        }
+
+        let datosActuales = [5, 2, 8, 2, 1, 9, 5, 3];
+        const datosOriginales = [5, 2, 8, 2, 1, 9, 5, 3];
+
+        const operaciones = {
+            filter: {
+                fn: arr => arr.filter(n => n > 3),
+                explicacion: 'filter(n > 3) selecciona solo los números mayores que 3'
+            },
+            map: {
+                fn: arr => arr.map(n => n * 2),
+                explicacion: 'map(n * 2) multiplica cada número por 2'
+            },
+            distinct: {
+                fn: arr => [...new Set(arr)],
+                explicacion: 'distinct() elimina los elementos duplicados'
+            },
+            sorted: {
+                fn: arr => [...arr].sort((a, b) => a - b),
+                explicacion: 'sorted() ordena los números de menor a mayor'
+            },
+            limit: {
+                fn: arr => arr.slice(0, 4),
+                explicacion: 'limit(4) toma solo los primeros 4 elementos'
+            },
+            skip: {
+                fn: arr => arr.slice(3),
+                explicacion: 'skip(3) omite los primeros 3 elementos'
+            }
+        };
+
+        function aplicarOperacion(tipo) {
+            const operacion = operaciones[tipo];
+            datosActuales = operacion.fn(datosActuales);
+            
+            document.getElementById('datos-entrada').textContent = 
+                JSON.stringify(datosOriginales);
+            document.getElementById('datos-salida').textContent = 
+                JSON.stringify(datosActuales);
+            document.getElementById('explicacion').textContent = 
+                operacion.explicacion;
+            
+            document.getElementById('datos-salida').style.animation = 'none';
+            setTimeout(() => {
+                document.getElementById('datos-salida').style.animation = 'fadeIn 0.5s';
+            }, 10);
+        }
+
+        function reiniciarVisualizador() {
+            datosActuales = [...datosOriginales];
+            document.getElementById('datos-entrada').textContent = 
+                JSON.stringify(datosOriginales);
+            document.getElementById('datos-salida').textContent = 
+                'Selecciona una operación...';
+            document.getElementById('explicacion').textContent = '';
+        }
+    </script>
+</body>
+</html>

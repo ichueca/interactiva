@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 1 - Crear Streams</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="teoria-titulo">🔧 Crear Streams</h1>
+            
+            <div class="teoria-seccion">
+                <h3>Formas de crear un Stream</h3>
+                <p>
+                    Existen varias formas de crear Streams en Java. Vamos a ver las tres más comunes
+                    que usarás en tu día a día.
+                </p>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>1. Desde una Colección (Collection.stream())</h3>
+                <p>
+                    La forma más común. Cualquier colección (List, Set, etc.) puede convertirse en Stream.
+                </p>
+                
+                <div class="codigo-ejemplo">
+                    <pre>List<String> nombres = Arrays.asList("Ana", "Pedro", "Juan");
+
+<span class="highlight">Stream<String> stream = nombres.stream();</span>
+
+// Ahora podemos aplicar operaciones
+stream.filter(n -> n.startsWith("A"))
+      .forEach(System.out::println);
+
+// Salida: Ana</pre>
+                </div>
+
+                <div class="codigo-ejemplo">
+                    <pre>// También funciona con Set
+Set<Integer> numeros = Set.of(1, 2, 3, 4, 5);
+
+<span class="highlight">Stream<Integer> stream = numeros.stream();</span>
+
+long pares = stream.filter(n -> n % 2 == 0).count();
+// Resultado: 2</pre>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>2. Desde un Array (Arrays.stream())</h3>
+                <p>
+                    Cuando trabajas con arrays, puedes convertirlos fácilmente en Streams.
+                </p>
+                
+                <div class="codigo-ejemplo">
+                    <pre>String[] palabras = {"Hola", "Mundo", "Java", "Streams"};
+
+<span class="highlight">Stream<String> stream = Arrays.stream(palabras);</span>
+
+stream.map(String::toUpperCase)
+      .forEach(System.out::println);
+
+// Salida: HOLA, MUNDO, JAVA, STREAMS</pre>
+                </div>
+
+                <div class="codigo-ejemplo">
+                    <pre>int[] numeros = {1, 2, 3, 4, 5};
+
+<span class="highlight">IntStream stream = Arrays.stream(numeros);</span>
+
+int suma = stream.sum();
+// Resultado: 15</pre>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>3. Directamente con valores (Stream.of())</h3>
+                <p>
+                    Puedes crear un Stream directamente con valores específicos.
+                </p>
+                
+                <div class="codigo-ejemplo">
+                    <pre><span class="highlight">Stream<String> stream = Stream.of("A", "B", "C", "D");</span>
+
+stream.forEach(System.out::println);
+// Salida: A, B, C, D</pre>
+                </div>
+
+                <div class="codigo-ejemplo">
+                    <pre><span class="highlight">Stream<Integer> numeros = Stream.of(10, 20, 30, 40);</span>
+
+int max = numeros.max(Integer::compareTo).orElse(0);
+// Resultado: 40</pre>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h3>💡 Sandbox Interactivo</h3>
+                <p>Arrastra un método de creación para ver el resultado:</p>
+                
+                <div class="sandbox-container">
+                    <div class="sandbox-input">
+                        <strong>Datos disponibles:</strong>
+                        <div class="datos-ejemplo">
+                            List: ["Manzana", "Banana", "Cereza"]<br>
+                            Array: [5, 10, 15, 20]<br>
+                            Valores: "X", "Y", "Z"
+                        </div>
+                    </div>
+                    
+                    <div class="sandbox-metodos" id="metodos-banco">
+                        <div class="metodo-pieza" draggable="true" data-metodo="collection">lista.stream()</div>
+                        <div class="metodo-pieza" draggable="true" data-metodo="array">Arrays.stream(array)</div>
+                        <div class="metodo-pieza" draggable="true" data-metodo="of">Stream.of("X", "Y", "Z")</div>
+                    </div>
+                    
+                    <div class="sandbox-drop" id="zona-drop">
+                        <p>Arrastra un método aquí</p>
+                    </div>
+                    
+                    <div class="sandbox-resultado" id="resultado">
+                        <strong>Resultado:</strong>
+                        <div id="resultado-texto">Arrastra un método para ver el resultado</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-anterior" onclick="navegarSiguiente('teoria1-1.html')">← Anterior</button>
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria1-3.html')">Siguiente: Operaciones →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria1-2.html');
+            configurarSandbox();
+        }
+
+        function configurarSandbox() {
+            const metodos = document.querySelectorAll('.metodo-pieza');
+            const zonaDrops = document.querySelectorAll('.sandbox-drop');
+            
+            metodos.forEach(metodo => {
+                metodo.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('metodo', e.target.dataset.metodo);
+                    e.target.classList.add('dragging');
+                });
+                
+                metodo.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            zonaDrops.forEach(zona => {
+                zona.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zona.classList.add('over');
+                });
+                
+                zona.addEventListener('dragleave', () => {
+                    zona.classList.remove('over');
+                });
+                
+                zona.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zona.classList.remove('over');
+                    
+                    const metodo = e.dataTransfer.getData('metodo');
+                    mostrarResultado(metodo);
+                });
+            });
+        }
+
+        function mostrarResultado(metodo) {
+            const resultadoTexto = document.getElementById('resultado-texto');
+            const resultados = {
+                collection: 'Stream creado desde List<br>Elementos: ["Manzana", "Banana", "Cereza"]<br>Tipo: Stream<String><br>Tamaño: 3 elementos',
+                array: 'Stream creado desde Array<br>Elementos: [5, 10, 15, 20]<br>Tipo: IntStream<br>Tamaño: 4 elementos',
+                of: 'Stream creado con valores directos<br>Elementos: ["X", "Y", "Z"]<br>Tipo: Stream<String><br>Tamaño: 3 elementos'
+            };
+            
+            resultadoTexto.innerHTML = resultados[metodo] || 'Método no reconocido';
+            document.getElementById('resultado').style.background = '#d4edda';
+        }
+    </script>
+</body>
+</html>

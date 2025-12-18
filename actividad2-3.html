@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 2.3 - Clasificar Operaciones</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🎯 Actividad 2.3: Clasificar Operaciones</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Clasifica cada operación según su tipo.</p>
+                <p>👉 Arrastra cada operación al contenedor correcto: <strong>Stateless</strong> (sin estado) o <strong>Stateful</strong> (con estado).</p>
+                <br>
+                <p><strong>Recuerda:</strong></p>
+                <ul>
+                    <li><strong>Stateless:</strong> Procesan cada elemento independientemente</li>
+                    <li><strong>Stateful:</strong> Necesitan información de otros elementos</li>
+                </ul>
+            </div>
+
+            <div class="banco-piezas" id="banco-piezas">
+                <div class="pieza-codigo" draggable="true" data-id="filter" data-tipo="stateless">filter()</div>
+                <div class="pieza-codigo" draggable="true" data-id="map" data-tipo="stateless">map()</div>
+                <div class="pieza-codigo" draggable="true" data-id="sorted" data-tipo="stateful">sorted()</div>
+                <div class="pieza-codigo" draggable="true" data-id="distinct" data-tipo="stateful">distinct()</div>
+                <div class="pieza-codigo" draggable="true" data-id="mapToInt" data-tipo="stateless">mapToInt()</div>
+                <div class="pieza-codigo" draggable="true" data-id="limit" data-tipo="stateful">limit()</div>
+            </div>
+
+            <div class="contenedores-clasificacion">
+                <div class="contenedor-drop" id="contenedor-stateless" data-tipo="stateless">
+                    <h3>🔹 Stateless (sin estado)</h3>
+                    <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                        Operaciones que procesan cada elemento de forma independiente
+                    </p>
+                </div>
+                <div class="contenedor-drop" id="contenedor-stateful" data-tipo="stateful">
+                    <h3>🔸 Stateful (con estado)</h3>
+                    <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                        Operaciones que necesitan ver múltiples elementos
+                    </p>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria3-1.html')">Continuar a Fase 3 →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad2-3';
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad2-3.html');
+            shufflePiezas();
+            configurarDragPiezas('#banco-piezas', '.contenedor-drop');
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shufflePiezas() {
+            const banco = document.getElementById('banco-piezas');
+            const piezas = Array.from(banco.children);
+
+            for (let i = piezas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [piezas[i], piezas[j]] = [piezas[j], piezas[i]];
+            }
+
+            piezas.forEach(pieza => banco.appendChild(pieza));
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const contenedores = document.querySelectorAll('.contenedor-drop');
+            let todoCorrecto = true;
+            let errores = [];
+            
+            contenedores.forEach(contenedor => {
+                const tipoEsperado = contenedor.dataset.tipo;
+                const piezas = contenedor.querySelectorAll('.pieza-codigo');
+                
+                contenedor.classList.remove('correcto', 'incorrecto');
+                
+                let contenedorCorrecto = true;
+                piezas.forEach(pieza => {
+                    if (pieza.dataset.tipo !== tipoEsperado) {
+                        contenedorCorrecto = false;
+                        todoCorrecto = false;
+                        errores.push(`${pieza.dataset.id} está en el contenedor incorrecto`);
+                    }
+                });
+                
+                if (piezas.length > 0) {
+                    if (contenedorCorrecto) {
+                        contenedor.classList.add('correcto');
+                    } else {
+                        contenedor.classList.add('incorrecto');
+                    }
+                }
+            });
+
+            const piezasEnBanco = document.querySelectorAll('#banco-piezas .pieza-codigo');
+            if (piezasEnBanco.length > 0) {
+                todoCorrecto = false;
+                errores.push('Aún hay operaciones sin clasificar');
+            }
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Clasificación correcta</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        <strong>Stateless:</strong> filter(), map(), mapToInt() - procesan elemento a elemento.<br>
+                        <strong>Stateful:</strong> sorted(), distinct(), limit() - necesitan ver múltiples elementos.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                feedback.className = 'feedback error';
+                let pista = '';
+                
+                if (intentos === 1) {
+                    pista = '<br><strong>Pista:</strong> Piensa: ¿la operación necesita ver todos los elementos antes de producir un resultado?';
+                } else if (intentos === 2) {
+                    pista = '<br><strong>Pista:</strong> sorted() necesita ver todos los elementos para ordenar. filter() procesa uno a uno.';
+                } else {
+                    pista = '<br><strong>Solución:</strong> Stateless: filter, map, mapToInt | Stateful: sorted, distinct, limit';
+                }
+                
+                feedback.innerHTML = `
+                    <div>✗ Revisa la clasificación (Intento ${intentos})</div>
+                    <div class="feedback-detalle">${pista}</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const contenedores = document.querySelectorAll('.contenedor-drop');
+            const banco = document.getElementById('banco-piezas');
+            
+            contenedores.forEach(contenedor => {
+                const piezas = contenedor.querySelectorAll('.pieza-codigo');
+                piezas.forEach(pieza => {
+                    banco.appendChild(pieza);
+                });
+                contenedor.classList.remove('correcto', 'incorrecto');
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>

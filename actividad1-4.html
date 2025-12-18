@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 1.4 - Predecir el Resultado</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🔮 Actividad 1.4: Predecir el Resultado</h1>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Analiza el código y predice qué resultado producirá.</p>
+            </div>
+
+            <div class="codigo-analizar">
+                <div class="codigo-titulo">📝 Código a analizar:</div>
+                <pre><code>List<String> nombres = Arrays.asList("Ana", "Pedro", "Luis", "Ana");
+
+nombres.stream()
+       .distinct()
+       .count()</code></pre>
+            </div>
+
+            <div class="prediccion-container">
+                <p><strong>¿Cuál será el resultado?</strong></p>
+                <div class="opciones-prediccion">
+                    <div class="opcion-prediccion" data-correcto="false" onclick="seleccionarOpcion(this)">
+                        <div class="opcion-numero">A</div>
+                        <div class="opcion-texto">4</div>
+                    </div>
+                    <div class="opcion-prediccion" data-correcto="true" onclick="seleccionarOpcion(this)">
+                        <div class="opcion-numero">B</div>
+                        <div class="opcion-texto">3</div>
+                    </div>
+                    <div class="opcion-prediccion" data-correcto="false" onclick="seleccionarOpcion(this)">
+                        <div class="opcion-numero">C</div>
+                        <div class="opcion-texto">2</div>
+                    </div>
+                    <div class="opcion-prediccion" data-correcto="false" onclick="seleccionarOpcion(this)">
+                        <div class="opcion-numero">D</div>
+                        <div class="opcion-texto">Error de compilación</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()" disabled id="btn-validar">✓ Validar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria2-1.html')">Continuar a Fase 2 →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad1-4';
+        let intentos = 0;
+        let opcionSeleccionada = null;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad1-4.html');
+            iniciarActividad();
+            
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function seleccionarOpcion(elemento) {
+            if (document.querySelector('.btn-validar').disabled && 
+                document.getElementById('boton-siguiente').style.display === 'block') {
+                return;
+            }
+
+            document.querySelectorAll('.opcion-prediccion').forEach(op => {
+                op.classList.remove('seleccionada');
+            });
+            
+            elemento.classList.add('seleccionada');
+            opcionSeleccionada = elemento;
+            document.getElementById('btn-validar').disabled = false;
+        }
+
+        function validar() {
+            if (!opcionSeleccionada) return;
+            
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const esCorrecto = opcionSeleccionada.dataset.correcto === 'true';
+            const feedback = document.getElementById('feedback');
+            
+            if (esCorrecto) {
+                opcionSeleccionada.classList.add('correcta');
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Correcto! ✓</div>
+                    <div class="feedback-detalle">
+                        <strong>Explicación:</strong> distinct() elimina duplicados ("Ana" aparece 2 veces), 
+                        quedando 3 elementos únicos: Ana, Pedro, Luis. count() devuelve 3.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                opcionSeleccionada.classList.add('incorrecta');
+                feedback.className = 'feedback error';
+                
+                let pista = '';
+                if (intentos >= 2) {
+                    pista = '<strong>Pista:</strong> distinct() elimina elementos duplicados del Stream';
+                }
+                
+                feedback.innerHTML = `
+                    <div>✗ Incorrecto (Intento ${intentos})</div>
+                    <div class="feedback-detalle">
+                        ${pista || 'Piensa en qué hace distinct() con los elementos repetidos'}
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    opcionSeleccionada.classList.remove('incorrecta', 'seleccionada');
+                    opcionSeleccionada = null;
+                    document.getElementById('btn-validar').disabled = true;
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>

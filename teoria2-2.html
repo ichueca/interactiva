@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 2.2 - Más Operaciones Intermedias</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🔄 Más Operaciones Intermedias</h1>
+
+            <div class="teoria-seccion">
+                <div class="operacion-detalle">
+                    <h3>4. limit() - Limitar elementos</h3>
+                    <p>Limita el Stream a un número máximo de elementos.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Stream.of(1, 2, 3, 4, 5)
+      .limit(3)  // Solo los primeros 3
+      // Resultado: 1, 2, 3</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>5. skip() - Saltar elementos</h3>
+                    <p>Omite los primeros N elementos del Stream.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Stream.of(1, 2, 3, 4, 5)
+      .skip(2)  // Salta los primeros 2
+      // Resultado: 3, 4, 5</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>6. sorted() - Ordenar elementos</h3>
+                    <p>Ordena los elementos del Stream. Puede usar orden natural o un Comparator personalizado.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Orden natural
+Stream.of(3, 1, 4, 2)
+      .sorted()
+      // Resultado: 1, 2, 3, 4
+
+// Con Comparator
+Stream.of("Ana", "Pedro", "Luis")
+      .sorted(Comparator.reverseOrder())
+      // Resultado: "Pedro", "Luis", "Ana"</code></pre>
+                    </div>
+                    
+                    <div class="nota-explicativa">
+                        <strong>💡 Nota sobre Comparator:</strong>
+                        <p>Un <code>Comparator</code> es una interfaz funcional que define cómo comparar dos elementos. 
+                        Puedes usar lambdas para crear comparadores personalizados:</p>
+                        <div class="ejemplo-codigo">
+                            <pre><code>// Lambda explícita
+.sorted((s1, s2) -> s1.compareTo(s2))
+
+// Method reference (más compacto)
+.sorted(String::compareTo)
+
+// Comparador inverso
+.sorted((s1, s2) -> s2.compareTo(s1))</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>🔗 Encadenamiento de Operaciones</h2>
+                <p>La verdadera potencia de los Streams está en combinar múltiples operaciones:</p>
+                <div class="ejemplo-codigo">
+                    <pre><code>List<String> nombres = Arrays.asList("Ana", "Pedro", "Luis", "María", "Ana");
+
+List<String> resultado = nombres.stream()
+    .distinct()              // Elimina duplicados
+    .filter(n -> n.length() > 3)  // Solo nombres con más de 3 letras
+    .map(String::toUpperCase)     // Convierte a mayúsculas
+    .sorted()                     // Ordena alfabéticamente
+    .collect(Collectors.toList());
+
+// Resultado: ["LUIS", "MARÍA", "PEDRO"]</code></pre>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria2-3.html')">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria2-2.html');
+        }
+    </script>
+</body>
+</html>

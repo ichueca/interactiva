@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Badge Modal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <div style="background: white; padding: 40px; border-radius: 20px; text-align: center;">
+            <h1>Test de Modal de Badges</h1>
+            <p style="margin: 20px 0;">Haz clic en los botones para probar los diferentes badges:</p>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button onclick="testBadge('primera_sangre')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 2px solid #667eea; background: white;">
+                    🎯 Primera Sangre
+                </button>
+                <button onclick="testBadge('velocista')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 2px solid #667eea; background: white;">
+                    ⚡ Velocista
+                </button>
+                <button onclick="testBadge('pensador_fase1')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 2px solid #667eea; background: white;">
+                    🧠 Pensador Fase 1
+                </button>
+                <button onclick="testBadge('racha_perfecta')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 2px solid #667eea; background: white;">
+                    🔥 Racha Perfecta
+                </button>
+                <button onclick="testBadge('maestro_streams')" style="padding: 15px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 2px solid #667eea; background: white;">
+                    🏆 Maestro de Streams
+                </button>
+            </div>
+            <button onclick="localStorage.clear(); alert('LocalStorage limpiado')" style="margin-top: 30px; padding: 15px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 2px solid #f44336; background: white; color: #f44336;">
+                🗑️ Limpiar LocalStorage
+            </button>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        function testBadge(badgeId) {
+            console.log('Testing badge:', badgeId);
+            mostrarNotificacionBadge(badgeId);
+        }
+    </script>
+</body>
+</html>
