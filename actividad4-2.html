@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 4.2 - Clasificador de Datos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🗂️ Actividad 4.2: Clasificador de Datos</h1>
+            <div class="badge-opcional">📚 Actividad Opcional - Nivel Avanzado</div>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Construye el código correcto usando <code>groupingBy()</code> para agrupar productos.</p>
+                <p>👉 <strong>Escenario:</strong> Tienes una lista de productos y quieres agruparlos por categoría.</p>
+                <p>Arrastra las piezas correctas para completar el código:</p>
+            </div>
+
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h3 style="margin-top: 0;">📦 Datos de ejemplo:</h3>
+                <div style="font-family: 'Courier New', monospace; background: white; padding: 15px; border-radius: 5px;">
+                    List&lt;Producto&gt; productos = Arrays.asList(<br>
+                    &nbsp;&nbsp;new Producto("Laptop", "Electrónica"),<br>
+                    &nbsp;&nbsp;new Producto("Mouse", "Electrónica"),<br>
+                    &nbsp;&nbsp;new Producto("Mesa", "Muebles"),<br>
+                    &nbsp;&nbsp;new Producto("Silla", "Muebles")<br>
+                    );
+                </div>
+            </div>
+
+            <h3>🔧 Construye el código:</h3>
+
+            <div class="codigo-construccion">
+                <div class="linea-construccion">
+                    <span class="codigo-fijo">Map&lt;String, List&lt;Producto&gt;&gt; porCategoria = productos</span>
+                </div>
+                <div class="linea-construccion">
+                    <span class="codigo-fijo" style="margin-left: 40px;">.stream()</span>
+                </div>
+                <div class="linea-construccion">
+                    <span class="codigo-fijo" style="margin-left: 40px;">.collect(Collectors.</span>
+                    <div class="slot-inline" id="slot-collector" data-tipo="collector"></div>
+                    <span class="codigo-fijo">(</span>
+                </div>
+                <div class="linea-construccion" style="margin-left: 80px;">
+                    <div class="slot-inline" id="slot-criterio" data-tipo="criterio"></div>
+                </div>
+                <div class="linea-construccion">
+                    <span class="codigo-fijo" style="margin-left: 40px;">));</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">🧩 Piezas disponibles:</h3>
+            <div class="piezas-banco" id="banco" style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                <!-- Collectors correctos e incorrectos -->
+                <div class="pieza-codigo" draggable="true" data-id="groupingBy" data-tipo="collector">groupingBy</div>
+                <div class="pieza-codigo" draggable="true" data-id="partitioningBy" data-tipo="collector">partitioningBy</div>
+                <div class="pieza-codigo" draggable="true" data-id="toList" data-tipo="collector">toList</div>
+                <div class="pieza-codigo" draggable="true" data-id="toSet" data-tipo="collector">toSet</div>
+                <div class="pieza-codigo" draggable="true" data-id="toMap" data-tipo="collector">toMap</div>
+                <div class="pieza-codigo" draggable="true" data-id="joining" data-tipo="collector">joining</div>
+                <div class="pieza-codigo" draggable="true" data-id="counting" data-tipo="collector">counting</div>
+
+                <!-- Criterios correctos e incorrectos -->
+                <div class="pieza-codigo" draggable="true" data-id="getCategoria" data-tipo="criterio">p -> p.getCategoria()</div>
+                <div class="pieza-codigo" draggable="true" data-id="getNombre" data-tipo="criterio">p -> p.getNombre()</div>
+                <div class="pieza-codigo" draggable="true" data-id="getPrecio" data-tipo="criterio">p -> p.getPrecio()</div>
+                <div class="pieza-codigo" draggable="true" data-id="getStock" data-tipo="criterio">p -> p.getStock()</div>
+                <div class="pieza-codigo" draggable="true" data-id="categoriaRef" data-tipo="criterio">Producto::getCategoria</div>
+                <div class="pieza-codigo" draggable="true" data-id="nombreRef" data-tipo="criterio">Producto::getNombre</div>
+                <div class="pieza-codigo" draggable="true" data-id="precioRef" data-tipo="criterio">Producto::getPrecio</div>
+            </div>
+
+            <div class="resultado-visual" id="resultado-visual" style="display: none; margin-top: 30px;">
+                <h3>📊 Resultado de la agrupación:</h3>
+                <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace;">
+                    {<br>
+                    &nbsp;&nbsp;"Electrónica": [Laptop, Mouse],<br>
+                    &nbsp;&nbsp;"Muebles": [Mesa, Silla]<br>
+                    }
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad4-3.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad4-2';
+        let intentos = 0;
+
+        const SOLUCION = {
+            collector: 'groupingBy',
+            criterio: 'getCategoria'  // También aceptamos 'categoriaRef'
+        };
+
+        const slots = {
+            collector: null,
+            criterio: null
+        };
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad4-2.html');
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function configurarDragDrop() {
+            const piezas = document.querySelectorAll('.pieza-codigo');
+            const slotsElements = document.querySelectorAll('.slot-inline');
+
+            piezas.forEach(pieza => {
+                pieza.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('pieza', e.target.dataset.id);
+                    e.dataTransfer.setData('tipo', e.target.dataset.tipo);
+                    e.target.classList.add('dragging');
+                    iniciarAutoScroll();
+                });
+
+                pieza.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                    detenerAutoScroll();
+                });
+            });
+
+            slotsElements.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+
+                    const piezaId = e.dataTransfer.getData('pieza');
+                    const piezaTipo = e.dataTransfer.getData('tipo');
+                    const slotTipo = slot.dataset.tipo;
+
+                    // Verificar que el tipo coincida
+                    if (piezaTipo !== slotTipo) {
+                        mostrarMensajeError('⚠️ Esa pieza no va en este slot');
+                        return;
+                    }
+
+                    const piezaElement = document.querySelector(`[data-id="${piezaId}"]`);
+
+                    // Si ya hay una pieza, devolverla al banco
+                    if (slots[slotTipo]) {
+                        const anterior = document.querySelector(`[data-id="${slots[slotTipo]}"]`);
+                        if (anterior) {
+                            document.getElementById('banco').appendChild(anterior);
+                            anterior.style.display = 'block';
+                        }
+                    }
+
+                    // Colocar nueva pieza
+                    slots[slotTipo] = piezaId;
+                    slot.textContent = piezaElement.textContent;
+                    slot.classList.add('filled');
+                    piezaElement.style.display = 'none';
+                });
+            });
+
+            // Permitir devolver al banco haciendo clic en el slot
+            slotsElements.forEach(slot => {
+                slot.addEventListener('dblclick', () => {
+                    const slotTipo = slot.dataset.tipo;
+                    if (slots[slotTipo]) {
+                        const pieza = document.querySelector(`[data-id="${slots[slotTipo]}"]`);
+                        if (pieza) {
+                            document.getElementById('banco').appendChild(pieza);
+                            pieza.style.display = 'block';
+                        }
+                        slots[slotTipo] = null;
+                        slot.textContent = '';
+                        slot.classList.remove('filled');
+                    }
+                });
+            });
+        }
+
+        function mostrarMensajeError(mensaje) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback error';
+            feedback.innerHTML = `<div>${mensaje}</div>`;
+            setTimeout(() => {
+                if (feedback.className === 'feedback error' && feedback.textContent === mensaje) {
+                    feedback.className = 'feedback';
+                    feedback.innerHTML = '';
+                }
+            }, 2000);
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const feedback = document.getElementById('feedback');
+
+            // Verificar que ambos slots estén llenos
+            if (!slots.collector || !slots.criterio) {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Faltan piezas por colocar (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Debes completar ambos slots del código</div>
+                `;
+                return;
+            }
+
+            // Verificar la solución (aceptamos tanto lambda como method reference para criterio)
+            const collectorCorrecto = slots.collector === SOLUCION.collector;
+            const criterioCorrecto = slots.criterio === 'getCategoria' || slots.criterio === 'categoriaRef';
+
+            if (collectorCorrecto && criterioCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Código correcto</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        <code>groupingBy()</code> agrupa elementos según el criterio que le pases (en este caso, la categoría).
+                    </div>
+                `;
+
+                document.getElementById('resultado-visual').style.display = 'block';
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                let errores = [];
+                if (!collectorCorrecto) {
+                    errores.push('El collector no es correcto');
+                }
+                if (!criterioCorrecto) {
+                    errores.push('El criterio de agrupación no es correcto');
+                }
+
+                let mensaje = errores.join(' y ');
+                if (intentos >= 2) {
+                    mensaje += '<br><strong>Pista:</strong> Necesitas agrupar por categoría usando groupingBy';
+                }
+                if (intentos >= 3) {
+                    mensaje += '<br><strong>Pista:</strong> El criterio debe extraer la categoría de cada producto';
+                }
+
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ ${mensaje} (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Revisa qué collector usar y qué criterio aplicar</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            // Devolver todas las piezas al banco
+            document.querySelectorAll('.pieza-codigo').forEach(pieza => {
+                pieza.style.display = 'block';
+                document.getElementById('banco').appendChild(pieza);
+            });
+
+            // Limpiar slots
+            document.querySelectorAll('.slot-inline').forEach(slot => {
+                slot.textContent = '';
+                slot.classList.remove('filled');
+            });
+
+            slots.collector = null;
+            slots.criterio = null;
+
+            document.getElementById('resultado-visual').style.display = 'none';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+
+        function iniciarAutoScroll() {
+            let lastY = 0;
+
+            document.addEventListener('dragover', handleDragScroll);
+            document.addEventListener('touchmove', handleTouchScroll);
+
+            function handleDragScroll(e) {
+                lastY = e.clientY;
+                autoScroll(lastY);
+            }
+
+            function handleTouchScroll(e) {
+                if (e.touches.length > 0) {
+                    lastY = e.touches[0].clientY;
+                    autoScroll(lastY);
+                }
+            }
+
+            function autoScroll(clientY) {
+                const scrollThreshold = 100;
+                const scrollSpeed = 10;
+                const windowHeight = window.innerHeight;
+
+                if (clientY < scrollThreshold) {
+                    window.scrollBy(0, -scrollSpeed);
+                } else if (clientY > windowHeight - scrollThreshold) {
+                    window.scrollBy(0, scrollSpeed);
+                }
+            }
+
+            window._handleDragScroll = handleDragScroll;
+            window._handleTouchScroll = handleTouchScroll;
+        }
+
+        function detenerAutoScroll() {
+            if (window._handleDragScroll) {
+                document.removeEventListener('dragover', window._handleDragScroll);
+                delete window._handleDragScroll;
+            }
+            if (window._handleTouchScroll) {
+                document.removeEventListener('touchmove', window._handleTouchScroll);
+                delete window._handleTouchScroll;
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 4.1 - Reduce y Agregación</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🚀 Fase 4: Operaciones Avanzadas</h1>
+            <div class="badge-opcional">📚 Contenido Opcional - Nivel Avanzado</div>
+
+            <div class="teoria-seccion">
+                <h2>🔄 La operación reduce()</h2>
+                <p><code>reduce()</code> es una de las operaciones más poderosas de Streams. Permite <strong>combinar todos los elementos</strong> 
+                del Stream en un único resultado mediante una operación acumulativa.</p>
+                
+                <div class="caracteristicas-box">
+                    <h3>✨ ¿Qué hace reduce?</h3>
+                    <ul>
+                        <li>🎯 <strong>Combina elementos:</strong> Toma dos elementos y los reduce a uno</li>
+                        <li>🔁 <strong>Proceso iterativo:</strong> Repite la operación hasta tener un solo resultado</li>
+                        <li>📦 <strong>Devuelve Optional:</strong> Puede no haber resultado si el Stream está vacío</li>
+                        <li>⚡ <strong>Muy versátil:</strong> Suma, multiplicación, concatenación, máximo, mínimo...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>📋 Formas de usar reduce()</h2>
+                
+                <div class="operacion-detalle">
+                    <h3>1. reduce() con acumulador simple</h3>
+                    <p>Solo especificas cómo combinar dos elementos.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Sumar todos los números
+Optional<Integer> suma = Stream.of(1, 2, 3, 4, 5)
+    .reduce((a, b) -> a + b);
+// Resultado: Optional[15]
+
+// Encontrar el máximo
+Optional<Integer> max = Stream.of(3, 7, 2, 9, 1)
+    .reduce((a, b) -> a > b ? a : b);
+// Resultado: Optional[9]</code></pre>
+                    </div>
+                    <div class="nota-importante">
+                        <strong>💡 Nota:</strong> Devuelve <code>Optional</code> porque el Stream podría estar vacío.
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>2. reduce() con valor inicial (identidad)</h3>
+                    <p>Especificas un valor inicial y cómo combinar elementos.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Sumar con valor inicial 0
+Integer suma = Stream.of(1, 2, 3, 4, 5)
+    .reduce(0, (a, b) -> a + b);
+// Resultado: 15 (no Optional)
+
+// Multiplicar con valor inicial 1
+Integer producto = Stream.of(2, 3, 4)
+    .reduce(1, (a, b) -> a * b);
+// Resultado: 24
+
+// Concatenar strings
+String texto = Stream.of("Hola", " ", "Mundo")
+    .reduce("", (a, b) -> a + b);
+// Resultado: "Hola Mundo"</code></pre>
+                    </div>
+                    <div class="nota-importante">
+                        <strong>💡 Nota:</strong> Con valor inicial NO devuelve <code>Optional</code>, siempre hay resultado.
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>3. reduce() completo (con combinador)</h3>
+                    <p>Para Streams paralelos: valor inicial, acumulador y combinador.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Suma paralela
+Integer suma = Stream.of(1, 2, 3, 4, 5)
+    .parallel()
+    .reduce(
+        0,                    // Identidad
+        (a, b) -> a + b,     // Acumulador
+        (a, b) -> a + b      // Combinador
+    );
+// Resultado: 15</code></pre>
+                    </div>
+                    <div class="nota-importante">
+                        <strong>⚡ Importante:</strong> El combinador se usa para combinar resultados parciales en procesamiento paralelo.
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>🎯 Ejemplos Prácticos</h2>
+                
+                <div class="ejemplo-practico">
+                    <h4>Ejemplo 1: Encontrar el string más largo</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Optional<String> masLargo = Stream.of("Java", "Streams", "API")
+    .reduce((s1, s2) -> s1.length() > s2.length() ? s1 : s2);
+// Resultado: Optional["Streams"]</code></pre>
+                    </div>
+                </div>
+
+                <div class="ejemplo-practico">
+                    <h4>Ejemplo 2: Calcular factorial</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Integer factorial = Stream.of(1, 2, 3, 4, 5)
+    .reduce(1, (a, b) -> a * b);
+// Resultado: 120 (5!)</code></pre>
+                    </div>
+                </div>
+
+                <div class="ejemplo-practico">
+                    <h4>Ejemplo 3: Combinar objetos</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>class Persona {
+    String nombre;
+    int edad;
+}
+
+// Encontrar la persona mayor
+Optional<Persona> mayor = personas.stream()
+    .reduce((p1, p2) -> p1.edad > p2.edad ? p1 : p2);</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria4-2.html')">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria4-1.html');
+        }
+    </script>
+</body>
+</html>
+

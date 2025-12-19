@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 4.2 - Collectors Avanzados</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🚀 Fase 4: Collectors Avanzados</h1>
+            <div class="badge-opcional">📚 Contenido Opcional - Nivel Avanzado</div>
+
+            <div class="teoria-seccion">
+                <h2>🗂️ Collectors con múltiples parámetros</h2>
+                <p>Los <code>Collectors</code> avanzados permiten <strong>agrupar, particionar y transformar</strong> datos 
+                de formas complejas. Son especialmente útiles para análisis de datos y generación de reportes.</p>
+                
+                <div class="caracteristicas-box">
+                    <h3>✨ ¿Por qué son importantes?</h3>
+                    <ul>
+                        <li>📊 <strong>Agrupación de datos:</strong> Organizar elementos por categorías</li>
+                        <li>🔀 <strong>Particionamiento:</strong> Dividir en dos grupos según condición</li>
+                        <li>🎯 <strong>Agregaciones anidadas:</strong> Combinar múltiples operaciones</li>
+                        <li>⚡ <strong>Eficiencia:</strong> Todo en una sola pasada por los datos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>📋 Collectors Principales</h2>
+                
+                <div class="operacion-detalle">
+                    <h3>1. groupingBy() - Agrupar elementos</h3>
+                    <p>Agrupa elementos según una función clasificadora.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Agrupar personas por edad
+Map<Integer, List<Persona>> porEdad = personas.stream()
+    .collect(Collectors.groupingBy(p -> p.getEdad()));
+
+// Agrupar strings por longitud
+Map<Integer, List<String>> porLongitud = Stream.of("a", "bb", "ccc", "dd")
+    .collect(Collectors.groupingBy(String::length));
+// Resultado: {1=[a], 2=[bb, dd], 3=[ccc]}
+
+// Agrupar números por par/impar
+Map<String, List<Integer>> parImpar = Stream.of(1, 2, 3, 4, 5)
+    .collect(Collectors.groupingBy(n -> n % 2 == 0 ? "Par" : "Impar"));
+// Resultado: {Par=[2, 4], Impar=[1, 3, 5]}</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>2. groupingBy() con downstream collector</h3>
+                    <p>Agrupa y aplica otra operación a cada grupo.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Contar elementos por grupo
+Map<Integer, Long> contarPorLongitud = Stream.of("a", "bb", "ccc", "dd")
+    .collect(Collectors.groupingBy(
+        String::length,           // Clasificador
+        Collectors.counting()     // Operación en cada grupo
+    ));
+// Resultado: {1=1, 2=2, 3=1}
+
+// Sumar edades por ciudad
+Map<String, Integer> sumaEdadesPorCiudad = personas.stream()
+    .collect(Collectors.groupingBy(
+        Persona::getCiudad,
+        Collectors.summingInt(Persona::getEdad)
+    ));
+
+// Obtener nombres por departamento
+Map<String, List<String>> nombresPorDpto = empleados.stream()
+    .collect(Collectors.groupingBy(
+        Empleado::getDepartamento,
+        Collectors.mapping(Empleado::getNombre, Collectors.toList())
+    ));</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>3. partitioningBy() - Dividir en dos grupos</h3>
+                    <p>Divide elementos en dos grupos: true y false según un predicado.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Separar números pares e impares
+Map<Boolean, List<Integer>> paresImpares = Stream.of(1, 2, 3, 4, 5)
+    .collect(Collectors.partitioningBy(n -> n % 2 == 0));
+// Resultado: {false=[1, 3, 5], true=[2, 4]}
+
+// Separar aprobados y suspendidos
+Map<Boolean, List<Estudiante>> aprobados = estudiantes.stream()
+    .collect(Collectors.partitioningBy(e -> e.getNota() >= 5));
+
+// Contar aprobados y suspendidos
+Map<Boolean, Long> contarAprobados = estudiantes.stream()
+    .collect(Collectors.partitioningBy(
+        e -> e.getNota() >= 5,
+        Collectors.counting()
+    ));</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>4. Otros Collectors útiles</h3>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// joining() - Unir strings con delimitador
+String nombres = personas.stream()
+    .map(Persona::getNombre)
+    .collect(Collectors.joining(", ", "[", "]"));
+// Resultado: "[Ana, Juan, María]"
+
+// summarizingInt() - Estadísticas completas
+IntSummaryStatistics stats = personas.stream()
+    .collect(Collectors.summarizingInt(Persona::getEdad));
+// stats.getAverage(), getMax(), getMin(), getSum(), getCount()
+
+// toMap() - Crear mapa personalizado
+Map<String, Integer> nombreEdad = personas.stream()
+    .collect(Collectors.toMap(
+        Persona::getNombre,    // Key
+        Persona::getEdad       // Value
+    ));</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>🎯 Ejemplos Complejos</h2>
+                
+                <div class="ejemplo-practico">
+                    <h4>Ejemplo 1: Agrupar y encontrar el máximo en cada grupo</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>Map<String, Optional<Empleado>> mejorPorDpto = empleados.stream()
+    .collect(Collectors.groupingBy(
+        Empleado::getDepartamento,
+        Collectors.maxBy(Comparator.comparing(Empleado::getSalario))
+    ));</code></pre>
+                    </div>
+                </div>
+
+                <div class="ejemplo-practico">
+                    <h4>Ejemplo 2: Agrupación multinivel</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Agrupar por ciudad y luego por edad
+Map<String, Map<Integer, List<Persona>>> porCiudadYEdad = 
+    personas.stream()
+        .collect(Collectors.groupingBy(
+            Persona::getCiudad,
+            Collectors.groupingBy(Persona::getEdad)
+        ));</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('teoria4-3.html')">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria4-2.html');
+        }
+    </script>
+</body>
+</html>
+

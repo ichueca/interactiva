@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 4.4 - Debugging Visual</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🐛 Actividad 4.4: Debugging Visual</h1>
+            <div class="badge-opcional">📚 Actividad Opcional - Nivel Avanzado</div>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Encuentra y corrige los 3 errores en este código de Streams.</p>
+                <p>👉 El código intenta:</p>
+                <ul>
+                    <li>Obtener los nombres de personas mayores de 18 años</li>
+                    <li>Convertirlos a mayúsculas</li>
+                    <li>Ordenarlos alfabéticamente</li>
+                    <li>Recolectarlos en una lista</li>
+                </ul>
+            </div>
+
+            <div class="codigo-con-errores">
+                <div class="linea-codigo">
+                    <span class="numero-linea">1</span>
+                    <span class="codigo-texto">List&lt;String&gt; nombres = personas.stream()</span>
+                </div>
+                <div class="linea-codigo error-linea" id="linea-2">
+                    <span class="numero-linea">2</span>
+                    <span class="codigo-texto" id="texto-linea-2">.map(p -> p.getNombre().toUpperCase())</span>
+                    <span class="icono-error">❌</span>
+                </div>
+                <div class="linea-codigo error-linea" id="linea-3">
+                    <span class="numero-linea">3</span>
+                    <span class="codigo-texto" id="texto-linea-3">.filter(p -> p.getEdad() > 18)</span>
+                    <span class="icono-error">❌</span>
+                </div>
+                <div class="linea-codigo error-linea" id="linea-4">
+                    <span class="numero-linea">4</span>
+                    <span class="codigo-texto" id="texto-linea-4">.sorted(Comparator.reverseOrder())</span>
+                    <span class="icono-error">❌</span>
+                </div>
+                <div class="linea-codigo">
+                    <span class="numero-linea">5</span>
+                    <span class="codigo-texto">.collect(Collectors.toList());</span>
+                </div>
+            </div>
+
+            <div style="margin: 30px 0;">
+                <h3>🔧 Correcciones disponibles:</h3>
+                <p style="color: #666; margin-bottom: 15px;">Arrastra la corrección adecuada a cada línea con error</p>
+                
+                <div class="piezas-banco" id="banco" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div class="correccion-pieza" draggable="true" data-id="corr-1" data-linea="2">.filter(p -> p.getEdad() > 18)</div>
+                    <div class="correccion-pieza" draggable="true" data-id="corr-2" data-linea="3">.map(p -> p.getNombre().toUpperCase())</div>
+                    <div class="correccion-pieza" draggable="true" data-id="corr-3" data-linea="4">.sorted()</div>
+                    <div class="correccion-pieza" draggable="true" data-id="dist-1">.distinct()</div>
+                    <div class="correccion-pieza" draggable="true" data-id="dist-2">.limit(10)</div>
+                    <div class="correccion-pieza" draggable="true" data-id="dist-3">.filter(p -> p.getEdad() >= 18)</div>
+                </div>
+            </div>
+
+            <div class="explicacion-errores" id="explicacion" style="display: none;">
+                <h3>📚 Explicación de los errores:</h3>
+                <div class="error-explicacion">
+                    <strong>Error en línea 2:</strong> Se está intentando transformar a mayúsculas ANTES de filtrar. 
+                    Esto es ineficiente y además después del map() ya no tenemos acceso al objeto Persona completo.
+                </div>
+                <div class="error-explicacion">
+                    <strong>Error en línea 3:</strong> Después del map() solo tenemos Strings, no objetos Persona. 
+                    El filter() debe ir ANTES del map().
+                </div>
+                <div class="error-explicacion">
+                    <strong>Error en línea 4:</strong> Se está ordenando en orden inverso cuando se pide orden alfabético normal.
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('resumen.html')">Volver al Resumen →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad4-4';
+        let intentos = 0;
+
+        const CORRECCIONES = {
+            2: 'corr-1',  // .filter(p -> p.getEdad() > 18)
+            3: 'corr-2',  // .map(p -> p.getNombre().toUpperCase())
+            4: 'corr-3'   // .sorted()
+        };
+
+        const correcciones_aplicadas = {
+            2: null,
+            3: null,
+            4: null
+        };
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad4-4.html');
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function configurarDragDrop() {
+            const piezas = document.querySelectorAll('.correccion-pieza');
+            const lineasError = document.querySelectorAll('.error-linea');
+            
+            piezas.forEach(pieza => {
+                pieza.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('correccion', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                    iniciarAutoScroll();
+                });
+
+                pieza.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                    detenerAutoScroll();
+                });
+            });
+            
+            lineasError.forEach(linea => {
+                linea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    linea.style.background = '#fff3cd';
+                });
+                
+                linea.addEventListener('dragleave', () => {
+                    linea.style.background = '';
+                });
+                
+                linea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    linea.style.background = '';
+                    
+                    const correccionId = e.dataTransfer.getData('correccion');
+                    const correccionElement = document.querySelector(`[data-id="${correccionId}"]`);
+                    const numeroLinea = parseInt(linea.id.split('-')[1]);
+                    
+                    // Devolver corrección anterior si existe
+                    if (correcciones_aplicadas[numeroLinea]) {
+                        const anterior = document.querySelector(`[data-id="${correcciones_aplicadas[numeroLinea]}"]`);
+                        if (anterior) {
+                            document.getElementById('banco').appendChild(anterior);
+                        }
+                    }
+                    
+                    // Aplicar nueva corrección
+                    correcciones_aplicadas[numeroLinea] = correccionId;
+                    document.getElementById(`texto-linea-${numeroLinea}`).textContent = correccionElement.textContent;
+                    linea.classList.add('corregida');
+                    
+                    // Ocultar la pieza (ya está aplicada)
+                    correccionElement.style.display = 'none';
+                });
+            });
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            let todoCorrecto = true;
+            let errores = 0;
+
+            for (let linea in CORRECCIONES) {
+                if (correcciones_aplicadas[linea] !== CORRECCIONES[linea]) {
+                    todoCorrecto = false;
+                    errores++;
+                }
+            }
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Todos los errores corregidos</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        Código correcto: filter() → map() → sorted() → collect()
+                    </div>
+                `;
+                
+                document.getElementById('explicacion').style.display = 'block';
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                let mensaje = `Hay ${errores} corrección${errores > 1 ? 'es' : ''} incorrecta${errores > 1 ? 's' : ''}`;
+                if (intentos >= 2) {
+                    mensaje += '<br><strong>Pista:</strong> Recuerda el orden: primero filtrar, luego transformar, después ordenar';
+                }
+                if (intentos >= 3) {
+                    mensaje += '<br><strong>Pista:</strong> Línea 2 debe filtrar, línea 3 debe transformar, línea 4 debe ordenar normalmente';
+                }
+                
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ ${mensaje} (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Piensa en el orden lógico de las operaciones</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            // Restaurar líneas originales
+            document.getElementById('texto-linea-2').textContent = '.map(p -> p.getNombre().toUpperCase())';
+            document.getElementById('texto-linea-3').textContent = '.filter(p -> p.getEdad() > 18)';
+            document.getElementById('texto-linea-4').textContent = '.sorted(Comparator.reverseOrder())';
+            
+            // Remover clase corregida
+            document.querySelectorAll('.error-linea').forEach(linea => {
+                linea.classList.remove('corregida');
+            });
+            
+            // Mostrar todas las piezas
+            document.querySelectorAll('.correccion-pieza').forEach(pieza => {
+                pieza.style.display = 'block';
+                document.getElementById('banco').appendChild(pieza);
+            });
+            
+            // Resetear correcciones aplicadas
+            for (let linea in correcciones_aplicadas) {
+                correcciones_aplicadas[linea] = null;
+            }
+            
+            document.getElementById('explicacion').style.display = 'none';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+
+        function iniciarAutoScroll() {
+            let lastY = 0;
+
+            document.addEventListener('dragover', handleDragScroll);
+            document.addEventListener('touchmove', handleTouchScroll);
+
+            function handleDragScroll(e) {
+                lastY = e.clientY;
+                autoScroll(lastY);
+            }
+
+            function handleTouchScroll(e) {
+                if (e.touches.length > 0) {
+                    lastY = e.touches[0].clientY;
+                    autoScroll(lastY);
+                }
+            }
+
+            function autoScroll(clientY) {
+                const scrollThreshold = 100;
+                const scrollSpeed = 10;
+                const windowHeight = window.innerHeight;
+
+                if (clientY < scrollThreshold) {
+                    window.scrollBy(0, -scrollSpeed);
+                } else if (clientY > windowHeight - scrollThreshold) {
+                    window.scrollBy(0, scrollSpeed);
+                }
+            }
+
+            window._handleDragScroll = handleDragScroll;
+            window._handleTouchScroll = handleTouchScroll;
+        }
+
+        function detenerAutoScroll() {
+            if (window._handleDragScroll) {
+                document.removeEventListener('dragover', window._handleDragScroll);
+                delete window._handleDragScroll;
+            }
+            if (window._handleTouchScroll) {
+                document.removeEventListener('touchmove', window._handleTouchScroll);
+                delete window._handleTouchScroll;
+            }
+        }
+    </script>
+</body>
+</html>
+

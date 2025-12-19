@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 4.3 - Pipeline Builder</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🔧 Actividad 4.3: Pipeline Builder</h1>
+            <div class="badge-opcional">📚 Actividad Opcional - Nivel Avanzado</div>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Construye un pipeline complejo que procese una lista de productos.</p>
+                <p>👉 Requisitos del pipeline:</p>
+                <ol>
+                    <li>Filtrar productos con precio mayor a 50€</li>
+                    <li>Transformar a mayúsculas los nombres</li>
+                    <li>Ordenar alfabéticamente</li>
+                    <li>Limitar a los primeros 3 resultados</li>
+                    <li>Recolectar en una lista</li>
+                </ol>
+                <p><strong>Datos de entrada:</strong> Stream de productos con nombre y precio</p>
+            </div>
+
+            <div class="piezas-banco" id="banco" style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                <div class="operacion-pieza" draggable="true" data-id="filter-precio" data-tipo="intermedia">.filter(p -> p.getPrecio() > 50)</div>
+                <div class="operacion-pieza" draggable="true" data-id="filter-precio2" data-tipo="intermedia">.filter(p -> p.getPrecio() >= 50)</div>
+                <div class="operacion-pieza" draggable="true" data-id="filter-precio3" data-tipo="intermedia">.filter(p -> p.getPrecio() < 50)</div>
+                <div class="operacion-pieza" draggable="true" data-id="filter-stock" data-tipo="intermedia">.filter(p -> p.getStock() > 0)</div>
+                <div class="operacion-pieza" draggable="true" data-id="map-upper" data-tipo="intermedia">.map(p -> p.getNombre().toUpperCase())</div>
+                <div class="operacion-pieza" draggable="true" data-id="map-lower" data-tipo="intermedia">.map(p -> p.getNombre().toLowerCase())</div>
+                <div class="operacion-pieza" draggable="true" data-id="map-precio" data-tipo="intermedia">.map(p -> p.getPrecio())</div>
+                <div class="operacion-pieza" draggable="true" data-id="sorted" data-tipo="intermedia">.sorted()</div>
+                <div class="operacion-pieza" draggable="true" data-id="sorted-reverse" data-tipo="intermedia">.sorted(Comparator.reverseOrder())</div>
+                <div class="operacion-pieza" draggable="true" data-id="sorted-precio" data-tipo="intermedia">.sorted(Comparator.comparing(Producto::getPrecio))</div>
+                <div class="operacion-pieza" draggable="true" data-id="limit-3" data-tipo="intermedia">.limit(3)</div>
+                <div class="operacion-pieza" draggable="true" data-id="limit-5" data-tipo="intermedia">.limit(5)</div>
+                <div class="operacion-pieza" draggable="true" data-id="limit-1" data-tipo="intermedia">.limit(1)</div>
+                <div class="operacion-pieza" draggable="true" data-id="skip-2" data-tipo="intermedia">.skip(2)</div>
+                <div class="operacion-pieza" draggable="true" data-id="skip-1" data-tipo="intermedia">.skip(1)</div>
+                <div class="operacion-pieza" draggable="true" data-id="distinct" data-tipo="intermedia">.distinct()</div>
+                <div class="operacion-pieza" draggable="true" data-id="collect-list" data-tipo="terminal">.collect(Collectors.toList())</div>
+                <div class="operacion-pieza" draggable="true" data-id="collect-set" data-tipo="terminal">.collect(Collectors.toSet())</div>
+                <div class="operacion-pieza" draggable="true" data-id="count" data-tipo="terminal">.count()</div>
+                <div class="operacion-pieza" draggable="true" data-id="foreach" data-tipo="terminal">.forEach(System.out::println)</div>
+            </div>
+
+            <div class="pipeline-builder">
+                <div class="pipeline-stage">
+                    <div class="stage-titulo">📦 Inicio del Stream</div>
+                    <div style="padding: 15px; background: #e3f2fd; border-radius: 8px; font-family: 'Courier New', monospace;">
+                        productos.stream()
+                    </div>
+                </div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-titulo">1️⃣ Filtrar por precio (> 50€)</div>
+                    <div class="stage-dropzone" id="stage-1" data-etapa="1"></div>
+                </div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-titulo">2️⃣ Transformar nombres a mayúsculas</div>
+                    <div class="stage-dropzone" id="stage-2" data-etapa="2"></div>
+                </div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-titulo">3️⃣ Ordenar alfabéticamente</div>
+                    <div class="stage-dropzone" id="stage-3" data-etapa="3"></div>
+                </div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-titulo">4️⃣ Limitar a 3 elementos</div>
+                    <div class="stage-dropzone" id="stage-4" data-etapa="4"></div>
+                </div>
+
+                <div class="pipeline-stage">
+                    <div class="stage-titulo">5️⃣ Recolectar en lista</div>
+                    <div class="stage-dropzone" id="stage-5" data-etapa="5"></div>
+                </div>
+            </div>
+
+            <div class="codigo-resultado" id="codigo-resultado" style="margin-top: 20px;">
+                <strong>Pipeline actual:</strong><br>
+                <code id="pipeline-code">productos.stream() ...</code>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad4-4.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad4-3';
+        let intentos = 0;
+
+        const SOLUCION = {
+            1: 'filter-precio',
+            2: 'map-upper',
+            3: 'sorted',
+            4: 'limit-3',
+            5: 'collect-list'
+        };
+
+        let autoScrollInterval = null;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad4-3.html');
+            configurarDragDrop();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function configurarDragDrop() {
+            const operaciones = document.querySelectorAll('.operacion-pieza');
+            const stages = document.querySelectorAll('.stage-dropzone');
+
+            operaciones.forEach(op => {
+                op.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('operacion', e.target.dataset.id);
+                    e.target.classList.add('dragging');
+                    iniciarAutoScroll();
+                });
+
+                op.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                    detenerAutoScroll();
+                });
+
+                // Para dispositivos táctiles
+                op.addEventListener('touchstart', (e) => {
+                    e.target.classList.add('dragging');
+                });
+
+                op.addEventListener('touchend', (e) => {
+                    e.target.classList.remove('dragging');
+                    detenerAutoScroll();
+                });
+            });
+
+            stages.forEach(stage => {
+                stage.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    stage.classList.add('over');
+                });
+
+                stage.addEventListener('dragleave', () => {
+                    stage.classList.remove('over');
+                });
+
+                stage.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    stage.classList.remove('over');
+
+                    const operacionId = e.dataTransfer.getData('operacion');
+                    const operacionElement = document.querySelector(`[data-id="${operacionId}"]`);
+
+                    // Si ya hay una operación, devolverla al banco
+                    const existente = stage.querySelector('.operacion-pieza');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+
+                    stage.appendChild(operacionElement);
+                    stage.classList.add('filled');
+                    actualizarPipeline();
+                });
+            });
+
+            // Permitir devolver al banco
+            const banco = document.getElementById('banco');
+            banco.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            banco.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const operacionId = e.dataTransfer.getData('operacion');
+                const operacionElement = document.querySelector(`[data-id="${operacionId}"]`);
+
+                // Remover filled del stage
+                const parentStage = operacionElement.closest('.stage-dropzone');
+                if (parentStage) {
+                    parentStage.classList.remove('filled');
+                }
+
+                banco.appendChild(operacionElement);
+                actualizarPipeline();
+            });
+        }
+
+        function iniciarAutoScroll() {
+            let lastY = 0;
+
+            document.addEventListener('dragover', handleDragScroll);
+            document.addEventListener('touchmove', handleTouchScroll);
+
+            function handleDragScroll(e) {
+                lastY = e.clientY;
+                autoScroll(lastY);
+            }
+
+            function handleTouchScroll(e) {
+                if (e.touches.length > 0) {
+                    lastY = e.touches[0].clientY;
+                    autoScroll(lastY);
+                }
+            }
+
+            function autoScroll(clientY) {
+                const scrollThreshold = 100; // Píxeles desde el borde para activar scroll
+                const scrollSpeed = 10;
+                const windowHeight = window.innerHeight;
+
+                // Scroll hacia arriba
+                if (clientY < scrollThreshold) {
+                    window.scrollBy(0, -scrollSpeed);
+                }
+                // Scroll hacia abajo
+                else if (clientY > windowHeight - scrollThreshold) {
+                    window.scrollBy(0, scrollSpeed);
+                }
+            }
+
+            // Guardar referencias para poder eliminarlas después
+            window._handleDragScroll = handleDragScroll;
+            window._handleTouchScroll = handleTouchScroll;
+        }
+
+        function detenerAutoScroll() {
+            if (window._handleDragScroll) {
+                document.removeEventListener('dragover', window._handleDragScroll);
+                delete window._handleDragScroll;
+            }
+            if (window._handleTouchScroll) {
+                document.removeEventListener('touchmove', window._handleTouchScroll);
+                delete window._handleTouchScroll;
+            }
+        }
+
+        function actualizarPipeline() {
+            let codigo = 'productos.stream()';
+            
+            for (let i = 1; i <= 5; i++) {
+                const stage = document.getElementById(`stage-${i}`);
+                const operacion = stage.querySelector('.operacion-pieza');
+                if (operacion) {
+                    codigo += '\n    ' + operacion.textContent;
+                }
+            }
+            
+            document.getElementById('pipeline-code').textContent = codigo;
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            let todoCorrecto = true;
+            let errores = [];
+
+            for (let i = 1; i <= 5; i++) {
+                const stage = document.getElementById(`stage-${i}`);
+                const operacion = stage.querySelector('.operacion-pieza');
+                
+                if (!operacion) {
+                    todoCorrecto = false;
+                    errores.push(`Falta la operación en la etapa ${i}`);
+                } else if (operacion.dataset.id !== SOLUCION[i]) {
+                    todoCorrecto = false;
+                    errores.push(`Operación incorrecta en la etapa ${i}`);
+                }
+            }
+
+            const feedback = document.getElementById('feedback');
+            
+            if (todoCorrecto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Pipeline construido correctamente</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        Este pipeline filtra, transforma, ordena, limita y recolecta datos de forma eficiente.
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                let mensaje = `Hay ${errores.length} error${errores.length > 1 ? 'es' : ''}`;
+                if (intentos >= 2) {
+                    mensaje += '<br><strong>Pista:</strong> Sigue el orden: filtrar precio > transformar a mayúsculas > ordenar > limitar a 3 > recolectar en lista';
+                }
+                
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ ${mensaje} (Intento ${intentos})</div>
+                    <div class="feedback-detalle">${errores.join('<br>')}</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const stages = document.querySelectorAll('.stage-dropzone');
+            const banco = document.getElementById('banco');
+            
+            stages.forEach(stage => {
+                const operacion = stage.querySelector('.operacion-pieza');
+                if (operacion) {
+                    banco.appendChild(operacion);
+                }
+                stage.classList.remove('filled');
+            });
+            
+            actualizarPipeline();
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+    </script>
+</body>
+</html>
+

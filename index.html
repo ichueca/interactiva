@@ -29,8 +29,21 @@
             </div>
 
             <div class="opciones-inicio">
-                <button id="btn-comenzar" class="btn-primary" disabled>Comenzar</button>
-                <button id="btn-continuar" class="btn-secondary" style="display: none;">Continuar donde lo dejé</button>
+                <button id="btn-comenzar" class="btn-primary" disabled>
+                    <span id="texto-comenzar">Comenzar</span>
+                </button>
+                <button id="btn-continuar" class="btn-secondary" style="display: none;">
+                    Continuar donde lo dejé
+                </button>
+            </div>
+
+            <div id="info-progreso" style="display: none; margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196f3;">
+                <strong>📊 Tu progreso actual:</strong>
+                <div style="margin-top: 10px; font-size: 14px;">
+                    <div>✓ <span id="info-actividades">0</span> actividades completadas</div>
+                    <div>⭐ <span id="info-puntos">0</span> puntos</div>
+                    <div>🏆 <span id="info-badges">0</span> logros</div>
+                </div>
             </div>
 
             <div class="info-contenido">
@@ -52,13 +65,23 @@
 
         // Verificar si hay progreso guardado
         const progresoGuardado = localStorage.getItem('streamProgress');
-        
+
         if (progresoGuardado) {
             const progreso = JSON.parse(progresoGuardado);
             btnContinuar.style.display = 'inline-block';
             equipoSelect.value = progreso.equipo;
             btnComenzar.disabled = false;
-            
+
+            // Mostrar información del progreso
+            const infoProgreso = document.getElementById('info-progreso');
+            infoProgreso.style.display = 'block';
+            document.getElementById('info-actividades').textContent = progreso.actividadesCompletadas.length;
+            document.getElementById('info-puntos').textContent = progreso.puntos || 0;
+            document.getElementById('info-badges').textContent = progreso.badges ? progreso.badges.length : 0;
+
+            // Cambiar texto del botón comenzar
+            document.getElementById('texto-comenzar').textContent = 'Ir al inicio del curso';
+
             btnContinuar.addEventListener('click', () => {
                 // Continuar donde lo dejó
                 window.location.href = progreso.ultimaPagina || 'teoria1.html';
@@ -73,16 +96,42 @@
             const equipo = equipoSelect.value;
             if (!equipo) return;
 
-            // Inicializar progreso
-            const progreso = {
-                equipo: equipo,
-                startTime: Date.now(),
-                actividadesCompletadas: [],
-                intentosPorActividad: {},
-                ultimaPagina: 'teoria1-1.html',
-                puntos: 0,
-                badges: []
-            };
+            let progreso;
+
+            // Si ya existe progreso, solo actualizar el equipo y resetear la página inicial
+            if (progresoGuardado) {
+                progreso = JSON.parse(progresoGuardado);
+
+                // Preguntar si quiere reiniciar si cambia de equipo
+                if (progreso.equipo !== equipo) {
+                    const confirmar = confirm(
+                        `Ya tienes progreso con el Equipo ${progreso.equipo}.\n\n` +
+                        `¿Quieres cambiar al Equipo ${equipo}?\n` +
+                        `(Se mantendrán tus puntos y logros)`
+                    );
+
+                    if (!confirmar) {
+                        equipoSelect.value = progreso.equipo;
+                        return;
+                    }
+
+                    progreso.equipo = equipo;
+                }
+
+                // Ir al inicio del curso pero mantener el progreso
+                progreso.ultimaPagina = 'teoria1-1.html';
+            } else {
+                // Crear nuevo progreso solo si no existe
+                progreso = {
+                    equipo: equipo,
+                    startTime: Date.now(),
+                    actividadesCompletadas: [],
+                    intentosPorActividad: {},
+                    ultimaPagina: 'teoria1-1.html',
+                    puntos: 0,
+                    badges: []
+                };
+            }
 
             localStorage.setItem('streamProgress', JSON.stringify(progreso));
             window.location.href = 'teoria1-1.html';
