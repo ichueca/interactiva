@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría 4.3 - Streams Paralelos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1>🚀 Fase 4: Streams Paralelos y Rendimiento</h1>
+            <div class="badge-opcional">📚 Contenido Opcional - Nivel Avanzado</div>
+
+            <div class="teoria-seccion">
+                <h2>⚡ ¿Qué son los Streams Paralelos?</h2>
+                <p>Los Streams paralelos dividen automáticamente los datos en <strong>múltiples fragmentos</strong> 
+                y los procesan en <strong>diferentes hilos</strong> simultáneamente, aprovechando los procesadores multinúcleo.</p>
+                
+                <div class="caracteristicas-box">
+                    <h3>✨ Ventajas y Consideraciones</h3>
+                    <ul>
+                        <li>🚀 <strong>Mayor velocidad:</strong> Procesa grandes volúmenes de datos más rápido</li>
+                        <li>🔄 <strong>Automático:</strong> Java gestiona la división y combinación de tareas</li>
+                        <li>⚠️ <strong>No siempre mejor:</strong> Para datos pequeños puede ser más lento</li>
+                        <li>🔒 <strong>Thread-safe:</strong> Las operaciones deben ser seguras para concurrencia</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>📋 Cómo crear Streams Paralelos</h2>
+                
+                <div class="operacion-detalle">
+                    <h3>1. Método parallel()</h3>
+                    <p>Convierte un Stream secuencial en paralelo.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Stream secuencial convertido a paralelo
+List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5);
+int suma = numeros.stream()
+    .parallel()              // Convertir a paralelo
+    .mapToInt(n -> n * 2)
+    .sum();</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>2. Método parallelStream()</h3>
+                    <p>Crea directamente un Stream paralelo desde una colección.</p>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Crear Stream paralelo directamente
+List<String> palabras = Arrays.asList("Java", "Streams", "Paralelo");
+long count = palabras.parallelStream()
+    .filter(s -> s.length() > 5)
+    .count();</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>⚖️ Cuándo usar Streams Paralelos</h2>
+                
+                <div class="ejemplo-practico">
+                    <h4>✅ Casos BUENOS para paralelización:</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// 1. Grandes volúmenes de datos
+List<Integer> millones = IntStream.range(0, 10_000_000)
+    .boxed()
+    .collect(Collectors.toList());
+
+int suma = millones.parallelStream()
+    .mapToInt(n -> n * n)
+    .sum();
+
+// 2. Operaciones computacionalmente costosas
+List<String> textos = obtenerMuchosTextos();
+List<String> procesados = textos.parallelStream()
+    .map(this::procesamientoComplejo)  // Operación pesada
+    .collect(Collectors.toList());
+
+// 3. Operaciones independientes (sin estado compartido)
+List<Integer> cuadrados = numeros.parallelStream()
+    .map(n -> n * n)  // Cada elemento es independiente
+    .collect(Collectors.toList());</code></pre>
+                    </div>
+                </div>
+
+                <div class="ejemplo-practico">
+                    <h4>❌ Casos MALOS para paralelización:</h4>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// 1. Colecciones pequeñas (overhead > beneficio)
+List<Integer> pocos = Arrays.asList(1, 2, 3, 4, 5);
+// NO usar parallel() aquí
+
+// 2. Operaciones con estado compartido
+List<Integer> resultado = new ArrayList<>();
+numeros.parallelStream()
+    .forEach(n -> resultado.add(n));  // ❌ NO thread-safe!
+
+// 3. Operaciones que requieren orden
+List<String> ordenado = palabras.parallelStream()
+    .sorted()  // Pierde eficiencia en paralelo
+    .collect(Collectors.toList());</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teoria-seccion">
+                <h2>🎯 Buenas Prácticas</h2>
+                
+                <div class="operacion-detalle">
+                    <h3>1. Evitar efectos secundarios</h3>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// ❌ MAL - Modificar estado externo
+int suma = 0;
+numeros.parallelStream()
+    .forEach(n -> suma += n);  // Race condition!
+
+// ✅ BIEN - Usar reduce
+int suma = numeros.parallelStream()
+    .reduce(0, Integer::sum);</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>2. Usar collectors thread-safe</h3>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// ✅ BIEN - Collectors son thread-safe
+List<Integer> resultado = numeros.parallelStream()
+    .filter(n -> n > 5)
+    .collect(Collectors.toList());
+
+// ✅ BIEN - groupingBy es thread-safe
+Map<Integer, List<Integer>> grupos = numeros.parallelStream()
+    .collect(Collectors.groupingBy(n -> n % 2));</code></pre>
+                    </div>
+                </div>
+
+                <div class="operacion-detalle">
+                    <h3>3. Medir el rendimiento</h3>
+                    <div class="ejemplo-codigo">
+                        <pre><code>// Siempre medir antes de decidir
+long inicio = System.currentTimeMillis();
+
+// Versión secuencial
+long resultadoSeq = datos.stream()
+    .filter(...)
+    .count();
+
+long tiempoSeq = System.currentTimeMillis() - inicio;
+
+inicio = System.currentTimeMillis();
+
+// Versión paralela
+long resultadoPar = datos.parallelStream()
+    .filter(...)
+    .count();
+
+long tiempoPar = System.currentTimeMillis() - inicio;
+
+System.out.println("Secuencial: " + tiempoSeq + "ms");
+System.out.println("Paralelo: " + tiempoPar + "ms");</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad4-1.html')">Comenzar Actividades →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('teoria4-3.html');
+        }
+    </script>
+</body>
+</html>
+

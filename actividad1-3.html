@@ -13,18 +13,32 @@
             <h1 class="actividad-titulo">🔨 Actividad 1.3: Construir un Stream</h1>
 
             <div class="enunciado">
-                <p><strong>Objetivo:</strong> Crea un Stream válido arrastrando las piezas en el orden correcto.</p>
-                <p>👉 Construye: <code>Stream.of(1,2,3).filter(n -> n > 1).collect(Collectors.toList())</code></p>
+                <p><strong>Objetivo:</strong> Construye un Stream válido que filtre números mayores que 1 y los recolecte en una lista.</p>
+                <p>👉 Requisitos:</p>
+                <ul>
+                    <li>Debe crear un Stream con los números 1, 2 y 3</li>
+                    <li>Debe filtrar solo los números mayores que 1</li>
+                    <li>Debe recolectar el resultado en una lista</li>
+                </ul>
             </div>
 
             <div class="constructor-container">
                 <div class="piezas-banco" id="banco">
                     <div class="pieza-codigo" draggable="true" data-id="stream">Stream.of(1,2,3)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="stream2">Stream.of(4,5,6)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="stream3">Stream.of(0,1,2)</div>
                     <div class="pieza-codigo" draggable="true" data-id="filter">.filter(n -> n > 1)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="filter2">.filter(n -> n < 2)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="filter3">.filter(n -> n >= 1)</div>
+                    <div class="pieza-codigo" draggable="true" data-id="filter4">.filter(n -> n != 1)</div>
                     <div class="pieza-codigo" draggable="true" data-id="map">.map(n -> n * 2)</div>
-                    <div class="pieza-codigo" draggable="true" data-id="collect">.collect(Collectors.toList())</div>
-                    <div class="pieza-codigo" draggable="true" data-id="count">.count()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="map2">.map(n -> n + 1)</div>
                     <div class="pieza-codigo" draggable="true" data-id="sorted">.sorted()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="distinct">.distinct()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="collect">.collect(Collectors.toList())</div>
+                    <div class="pieza-codigo" draggable="true" data-id="collect2">.collect(Collectors.toSet())</div>
+                    <div class="pieza-codigo" draggable="true" data-id="count">.count()</div>
+                    <div class="pieza-codigo" draggable="true" data-id="foreach">.forEach(System.out::println)</div>
                 </div>
 
                 <div class="zona-construccion">
@@ -170,19 +184,23 @@
                 feedback.innerHTML = `
                     <div>¡Perfecto! ✓ Stream construido correctamente</div>
                     <div class="feedback-detalle">
-                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        Resultado: <code>Stream.of(1,2,3).filter(n -> n > 1).collect(Collectors.toList())</code>
                     </div>
                 `;
-                
+
                 marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
                 document.getElementById('boton-siguiente').style.display = 'block';
                 document.querySelector('.btn-validar').disabled = true;
             } else {
                 let mensaje = 'El orden no es correcto';
                 if (intentos >= 2) {
-                    mensaje = '<strong>Pista:</strong> Primero crea el Stream, luego filtra, finalmente recolecta';
+                    mensaje = '<strong>Pista:</strong> Necesitas crear el Stream con (1,2,3), filtrar los mayores que 1, y recolectar en una lista';
                 }
-                
+                if (intentos >= 3) {
+                    mensaje = '<strong>Pista:</strong> Primero crea el Stream, luego filtra, finalmente recolecta con toList()';
+                }
+
                 feedback.className = 'feedback error';
                 feedback.innerHTML = `
                     <div>✗ ${mensaje} (Intento ${intentos})</div>

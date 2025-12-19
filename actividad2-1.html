@@ -18,7 +18,7 @@
 
             <div class="filtro-ejercicio">
                 <div class="datos-mostrar">
-                    <h3>📊 Datos: [10, 25, 30, 15, 40, 5, 35]</h3>
+                    <h3>📊 Datos: [10, 25, 30, 15, 40, 5, 35, 8, 32]</h3>
                 </div>
 
                 <div class="filtros-grid">
@@ -26,19 +26,19 @@
                         <div class="filtro-objetivo">
                             <strong>Objetivo:</strong> Números mayores que 20
                         </div>
-                        <div class="filtro-slot" data-correcto="mayor20" data-resultado="[25, 30, 40, 35]"></div>
+                        <div class="filtro-slot" data-correcto="mayor20" data-resultado="[25, 30, 40, 35, 32]"></div>
                     </div>
 
                     <div class="filtro-item">
                         <div class="filtro-objetivo">
                             <strong>Objetivo:</strong> Números pares
                         </div>
-                        <div class="filtro-slot" data-correcto="pares" data-resultado="[10, 30, 40]"></div>
+                        <div class="filtro-slot" data-correcto="pares" data-resultado="[10, 30, 40, 8, 32]"></div>
                     </div>
 
                     <div class="filtro-item">
                         <div class="filtro-objetivo">
-                            <strong>Objetivo:</strong> Números entre 10 y 30
+                            <strong>Objetivo:</strong> Desde 10 hasta 30 (ambos incluidos)
                         </div>
                         <div class="filtro-slot" data-correcto="rango" data-resultado="[10, 25, 30, 15]"></div>
                     </div>
@@ -46,10 +46,14 @@
 
                 <div class="predicados-banco" id="banco">
                     <div class="predicado-pieza" draggable="true" data-id="mayor20">n -> n > 20</div>
+                    <div class="predicado-pieza" draggable="true" data-id="mayorIgual20">n -> n >= 20</div>
+                    <div class="predicado-pieza" draggable="true" data-id="mayor25">n -> n > 25</div>
                     <div class="predicado-pieza" draggable="true" data-id="pares">n -> n % 2 == 0</div>
-                    <div class="predicado-pieza" draggable="true" data-id="rango">n -> n >= 10 && n <= 30</div>
-                    <div class="predicado-pieza" draggable="true" data-id="menor15">n -> n < 15</div>
                     <div class="predicado-pieza" draggable="true" data-id="impares">n -> n % 2 != 0</div>
+                    <div class="predicado-pieza" draggable="true" data-id="divisible5">n -> n % 5 == 0</div>
+                    <div class="predicado-pieza" draggable="true" data-id="rango">n -> n >= 10 && n <= 30</div>
+                    <div class="predicado-pieza" draggable="true" data-id="rangoExclusivo">n -> n > 10 && n < 30</div>
+                    <div class="predicado-pieza" draggable="true" data-id="menor15">n -> n < 15</div>
                 </div>
             </div>
 

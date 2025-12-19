@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 4.1 - Puzzle de Reduce</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="content-card">
+            <h1 class="actividad-titulo">🧩 Actividad 4.1: Puzzle de Reduce</h1>
+            <div class="badge-opcional">📚 Actividad Opcional - Nivel Avanzado</div>
+
+            <div class="enunciado">
+                <p><strong>Objetivo:</strong> Construye una operación reduce completa arrastrando los componentes correctos.</p>
+                <p>👉 Debes crear un reduce que:</p>
+                <ul>
+                    <li>Sume todos los números de un Stream</li>
+                    <li>Tenga un valor inicial de 0</li>
+                    <li>Use el operador de suma para combinar elementos</li>
+                </ul>
+            </div>
+
+            <div class="constructor-container">
+                <div class="piezas-banco" id="banco">
+                    <!-- Valores iniciales (identidad) -->
+                    <div class="pieza-codigo pieza-identidad" draggable="true" data-id="id-0" data-tipo="identidad">0</div>
+                    <div class="pieza-codigo pieza-identidad" draggable="true" data-id="id-1" data-tipo="identidad">1</div>
+                    <div class="pieza-codigo pieza-identidad" draggable="true" data-id="id-minus1" data-tipo="identidad">-1</div>
+                    <div class="pieza-codigo pieza-identidad" draggable="true" data-id="id-empty" data-tipo="identidad">""</div>
+                    <div class="pieza-codigo pieza-identidad" draggable="true" data-id="id-null" data-tipo="identidad">null</div>
+
+                    <!-- Acumuladores -->
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-suma" data-tipo="acumulador">(a, b) -> a + b</div>
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-resta" data-tipo="acumulador">(a, b) -> a - b</div>
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-mult" data-tipo="acumulador">(a, b) -> a * b</div>
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-max" data-tipo="acumulador">(a, b) -> Math.max(a, b)</div>
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-min" data-tipo="acumulador">(a, b) -> Math.min(a, b)</div>
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-concat" data-tipo="acumulador">(a, b) -> a + b</div>
+                    <div class="pieza-codigo pieza-acumulador" draggable="true" data-id="acc-wrong" data-tipo="acumulador">(a, b) -> b + a</div>
+
+                    <!-- Combinadores (para paralelo) -->
+                    <div class="pieza-codigo pieza-combinador" draggable="true" data-id="comb-suma" data-tipo="combinador">(a, b) -> a + b</div>
+                    <div class="pieza-codigo pieza-combinador" draggable="true" data-id="comb-resta" data-tipo="combinador">(a, b) -> a - b</div>
+                    <div class="pieza-codigo pieza-combinador" draggable="true" data-id="comb-mult" data-tipo="combinador">(a, b) -> a * b</div>
+                    <div class="pieza-codigo pieza-combinador" draggable="true" data-id="comb-max" data-tipo="combinador">(a, b) -> Math.max(a, b)</div>
+                </div>
+
+                <div class="zona-construccion">
+                    <div class="construccion-titulo">🎯 Construye el Reduce</div>
+                    
+                    <div class="reduce-template">
+                        <div class="reduce-line">
+                            <span class="codigo-fijo">Stream.of(1, 2, 3, 4, 5)</span>
+                        </div>
+                        <div class="reduce-line">
+                            <span class="codigo-fijo">.reduce(</span>
+                        </div>
+                        <div class="reduce-params">
+                            <div class="param-slot">
+                                <div class="param-label">Identidad (valor inicial):</div>
+                                <div class="slot-construccion" id="slot-identidad" data-tipo="identidad"></div>
+                            </div>
+                            <div class="param-slot">
+                                <div class="param-label">Acumulador (combinar elementos):</div>
+                                <div class="slot-construccion" id="slot-acumulador" data-tipo="acumulador"></div>
+                            </div>
+                            <div class="param-slot">
+                                <div class="param-label">Combinador (para paralelo):</div>
+                                <div class="slot-construccion" id="slot-combinador" data-tipo="combinador"></div>
+                            </div>
+                        </div>
+                        <div class="reduce-line">
+                            <span class="codigo-fijo">);</span>
+                        </div>
+                    </div>
+
+                    <div class="codigo-resultado" id="codigo-resultado">Arrastra las piezas a los slots...</div>
+                </div>
+            </div>
+
+            <div class="navegacion">
+                <button class="btn-validar" onclick="validar()">✓ Validar</button>
+                <button class="btn-reiniciar" onclick="reiniciar()">↻ Reiniciar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div id="boton-siguiente" style="display: none; margin-top: 20px; text-align: center;">
+                <button class="btn-siguiente" onclick="navegarSiguiente('actividad4-2.html')">Siguiente actividad →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        const ACTIVIDAD_ID = 'actividad4-1';
+        const SOLUCION = {
+            identidad: 'id-0',
+            acumulador: 'acc-suma',
+            combinador: 'comb-suma'
+        };
+        let intentos = 0;
+
+        if (verificarEquipo()) {
+            crearHeader();
+            actualizarUltimaPagina('actividad4-1.html');
+            shufflePiezas();
+            configurarConstructor();
+            iniciarActividad();
+
+            intentos = getIntentos(ACTIVIDAD_ID);
+        }
+
+        function shufflePiezas() {
+            const banco = document.getElementById('banco');
+            const piezas = Array.from(banco.children);
+
+            for (let i = piezas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [piezas[i], piezas[j]] = [piezas[j], piezas[i]];
+            }
+
+            piezas.forEach(pieza => banco.appendChild(pieza));
+        }
+
+        function configurarConstructor() {
+            const piezas = document.querySelectorAll('.pieza-codigo');
+            const slots = document.querySelectorAll('.slot-construccion');
+            
+            piezas.forEach(pieza => {
+                pieza.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('pieza', e.target.dataset.id);
+                    e.dataTransfer.setData('tipo', e.target.dataset.tipo);
+                    e.target.classList.add('dragging');
+                    iniciarAutoScroll();
+                });
+
+                pieza.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                    detenerAutoScroll();
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('over');
+                    
+                    const piezaId = e.dataTransfer.getData('pieza');
+                    const piezaTipo = e.dataTransfer.getData('tipo');
+                    const slotTipo = slot.dataset.tipo;
+                    
+                    // Verificar que el tipo coincide
+                    if (piezaTipo !== slotTipo) {
+                        mostrarFeedbackTemporal('⚠️ Esa pieza no va en este slot', 'warning');
+                        return;
+                    }
+                    
+                    const piezaElement = document.querySelector(`[data-id="${piezaId}"]`);
+                    
+                    const existente = slot.querySelector('.pieza-codigo');
+                    if (existente) {
+                        document.getElementById('banco').appendChild(existente);
+                    }
+                    
+                    slot.appendChild(piezaElement);
+                    actualizarCodigoResultado();
+                });
+            });
+        }
+
+        function mostrarFeedbackTemporal(mensaje, tipo) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${tipo}`;
+            feedback.textContent = mensaje;
+            setTimeout(() => {
+                feedback.className = 'feedback';
+                feedback.textContent = '';
+            }, 2000);
+        }
+
+        function actualizarCodigoResultado() {
+            const identidad = document.getElementById('slot-identidad').querySelector('.pieza-codigo');
+            const acumulador = document.getElementById('slot-acumulador').querySelector('.pieza-codigo');
+            const combinador = document.getElementById('slot-combinador').querySelector('.pieza-codigo');
+            
+            let codigo = 'Stream.of(1, 2, 3, 4, 5).reduce(';
+            
+            if (identidad) codigo += '\n    ' + identidad.textContent + ',';
+            else codigo += '\n    ???,';
+            
+            if (acumulador) codigo += '\n    ' + acumulador.textContent + ',';
+            else codigo += '\n    ???,';
+            
+            if (combinador) codigo += '\n    ' + combinador.textContent;
+            else codigo += '\n    ???';
+            
+            codigo += '\n);';
+            
+            document.getElementById('codigo-resultado').textContent = codigo;
+        }
+
+        function validar() {
+            intentos++;
+            registrarIntento(ACTIVIDAD_ID);
+
+            const identidad = document.getElementById('slot-identidad').querySelector('.pieza-codigo');
+            const acumulador = document.getElementById('slot-acumulador').querySelector('.pieza-codigo');
+            const combinador = document.getElementById('slot-combinador').querySelector('.pieza-codigo');
+
+            const feedback = document.getElementById('feedback');
+            
+            if (!identidad || !acumulador || !combinador) {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ Faltan piezas (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Debes completar los 3 parámetros del reduce</div>
+                `;
+                return;
+            }
+            
+            const correcto = 
+                identidad.dataset.id === SOLUCION.identidad &&
+                acumulador.dataset.id === SOLUCION.acumulador &&
+                combinador.dataset.id === SOLUCION.combinador;
+            
+            if (correcto) {
+                feedback.className = 'feedback exito';
+                feedback.innerHTML = `
+                    <div>¡Perfecto! ✓ Reduce construido correctamente</div>
+                    <div class="feedback-detalle">
+                        Has completado la actividad en ${intentos} intento${intentos > 1 ? 's' : ''}.<br>
+                        Este reduce suma todos los números empezando desde 0. Resultado: 15
+                    </div>
+                `;
+                
+                marcarActividadCompletada(ACTIVIDAD_ID, intentos, []);
+                document.getElementById('boton-siguiente').style.display = 'block';
+                document.querySelector('.btn-validar').disabled = true;
+            } else {
+                let mensaje = 'Algún parámetro no es correcto';
+                if (intentos >= 2) {
+                    mensaje = '<strong>Pista:</strong> Para sumar necesitas empezar en 0 y usar el operador +';
+                }
+                if (intentos >= 3) {
+                    mensaje = '<strong>Pista:</strong> Identidad=0, Acumulador y Combinador usan (a, b) -> a + b';
+                }
+                
+                feedback.className = 'feedback error';
+                feedback.innerHTML = `
+                    <div>✗ ${mensaje} (Intento ${intentos})</div>
+                    <div class="feedback-detalle">Piensa: ¿Qué valor inicial necesitas? ¿Cómo combinas dos números?</div>
+                `;
+            }
+        }
+
+        function reiniciar() {
+            const slots = document.querySelectorAll('.slot-construccion');
+            const banco = document.getElementById('banco');
+            
+            slots.forEach(slot => {
+                const pieza = slot.querySelector('.pieza-codigo');
+                if (pieza) {
+                    banco.appendChild(pieza);
+                }
+            });
+            
+            actualizarCodigoResultado();
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('boton-siguiente').style.display = 'none';
+            document.querySelector('.btn-validar').disabled = false;
+        }
+
+        function iniciarAutoScroll() {
+            let lastY = 0;
+
+            document.addEventListener('dragover', handleDragScroll);
+            document.addEventListener('touchmove', handleTouchScroll);
+
+            function handleDragScroll(e) {
+                lastY = e.clientY;
+                autoScroll(lastY);
+            }
+
+            function handleTouchScroll(e) {
+                if (e.touches.length > 0) {
+                    lastY = e.touches[0].clientY;
+                    autoScroll(lastY);
+                }
+            }
+
+            function autoScroll(clientY) {
+                const scrollThreshold = 100;
+                const scrollSpeed = 10;
+                const windowHeight = window.innerHeight;
+
+                if (clientY < scrollThreshold) {
+                    window.scrollBy(0, -scrollSpeed);
+                } else if (clientY > windowHeight - scrollThreshold) {
+                    window.scrollBy(0, scrollSpeed);
+                }
+            }
+
+            window._handleDragScroll = handleDragScroll;
+            window._handleTouchScroll = handleTouchScroll;
+        }
+
+        function detenerAutoScroll() {
+            if (window._handleDragScroll) {
+                document.removeEventListener('dragover', window._handleDragScroll);
+                delete window._handleDragScroll;
+            }
+            if (window._handleTouchScroll) {
+                document.removeEventListener('touchmove', window._handleTouchScroll);
+                delete window._handleTouchScroll;
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -41,6 +41,18 @@
 ### Finalización
 - **resumen.html** → Resumen final con estadísticas y badges
 
+### FASE 4: Operaciones Avanzadas (OPCIONAL)
+**Teoría:**
+1. **teoria4-1.html** - Reduce y operaciones de agregación complejas
+2. **teoria4-2.html** - Collectors avanzados (groupingBy, partitioningBy)
+3. **teoria4-3.html** - Streams paralelos y rendimiento
+
+**Actividades:**
+1. **actividad4-1.html** - Puzzle de Reduce (construir operaciones reduce)
+2. **actividad4-2.html** - Clasificador de Datos (groupingBy interactivo)
+3. **actividad4-3.html** - Pipeline Builder (construir pipelines complejos)
+4. **actividad4-4.html** - Debugging Visual (identificar y corregir errores)
+
 ## Flujo Completo de Navegación
 
 ```
@@ -83,6 +95,22 @@ actividad3-1.html (Fase 3 - Actividad 1)
 actividad3-2.html (Fase 3 - Actividad 2)
     ↓
 resumen.html (Resumen Final)
+    ↓ (Opcional)
+teoria4-1.html (Fase 4 - Teoría 1) [AVANZADO]
+    ↓
+teoria4-2.html (Fase 4 - Teoría 2) [AVANZADO]
+    ↓
+teoria4-3.html (Fase 4 - Teoría 3) [AVANZADO]
+    ↓
+actividad4-1.html (Fase 4 - Actividad 1: Puzzle de Reduce) [AVANZADO]
+    ↓
+actividad4-2.html (Fase 4 - Actividad 2: Clasificador de Datos) [AVANZADO]
+    ↓
+actividad4-3.html (Fase 4 - Actividad 3: Pipeline Builder) [AVANZADO]
+    ↓
+actividad4-4.html (Fase 4 - Actividad 4: Debugging Visual) [AVANZADO]
+    ↓
+resumen.html (Volver al Resumen)
 ```
 
 ## Sistema de Gamificación
@@ -111,6 +139,7 @@ resumen.html (Resumen Final)
 - ✅ Progreso visual en el header
 - ✅ Guardado automático del progreso
 - ✅ Opción de continuar donde se dejó
+- ✅ Acceso a contenido avanzado opcional desde resumen
 
 ### Actividades
 - ✅ Sistema de drag & drop
@@ -118,12 +147,20 @@ resumen.html (Resumen Final)
 - ✅ Feedback con pistas progresivas
 - ✅ Contador de intentos
 - ✅ Temporizador de actividad
+- ✅ Actividades táctiles optimizadas para pantallas interactivas
 
 ### Gamificación
 - ✅ Sistema de puntos
 - ✅ Badges desbloqueables
 - ✅ Notificaciones de logros
 - ✅ Resumen final con estadísticas
+
+### Contenido Avanzado (Fase 4)
+- ✅ Teoría sobre reduce, collectors avanzados y streams paralelos
+- ✅ Puzzle de Reduce (construir operaciones con identidad, acumulador y combinador)
+- ✅ Clasificador de Datos (groupingBy interactivo con drag & drop)
+- ✅ Pipeline Builder (construir pipelines complejos paso a paso)
+- ✅ Debugging Visual (identificar y corregir errores en código)
 
 ## Archivos Eliminados (Versiones Antiguas)
 - ❌ actividad1.html

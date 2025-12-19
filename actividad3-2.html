@@ -49,10 +49,15 @@
 
                 <div class="operaciones-pipeline-banco" id="banco">
                     <div class="operacion-pipeline-pieza" draggable="true" data-id="toList">.collect(Collectors.toList())</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="toSet">.collect(Collectors.toSet())</div>
                     <div class="operacion-pipeline-pieza" draggable="true" data-id="allMatch">.allMatch(p -> p.getEdad() >= 18)</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="anyMatch">.anyMatch(p -> p.getEdad() >= 18)</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="noneMatch">.noneMatch(p -> p.getEdad() < 18)</div>
                     <div class="operacion-pipeline-pieza" draggable="true" data-id="forEach">.forEach(System.out::println)</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="forEachOrdered">.forEachOrdered(System.out::println)</div>
                     <div class="operacion-pipeline-pieza" draggable="true" data-id="count">.count()</div>
                     <div class="operacion-pipeline-pieza" draggable="true" data-id="findFirst">.findFirst()</div>
+                    <div class="operacion-pipeline-pieza" draggable="true" data-id="findAny">.findAny()</div>
                 </div>
             </div>
 

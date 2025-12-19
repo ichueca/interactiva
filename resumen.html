@@ -20,12 +20,12 @@
             <div class="resumen-puntos-badges">
                 <div class="resumen-puntos-card">
                     <div class="puntos-icono">🏆</div>
-                    <div class="puntos-valor" id="puntos-totales">0</div>
+                    <div class="puntos-valor" id="resumen-puntos-totales">0</div>
                     <div class="puntos-label">Puntos Totales</div>
                 </div>
                 <div class="resumen-badges-card">
                     <div class="badges-icono">🎖️</div>
-                    <div class="badges-valor" id="badges-totales">0</div>
+                    <div class="badges-valor" id="resumen-badges-totales">0</div>
                     <div class="badges-label">Badges Conseguidos</div>
                 </div>
             </div>
@@ -89,6 +89,19 @@
                 </div>
             </div>
 
+            <div class="contenido-avanzado-box" id="contenido-avanzado-box">
+                <h3>🚀 ¿Quieres más desafíos?</h3>
+                <p>Has completado el curso básico. ¡Ahora puedes explorar contenido avanzado opcional!</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn-avanzado" onclick="irContenidoAvanzado()">
+                        📚 Acceder a Contenido Avanzado
+                    </button>
+                </div>
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">
+                    <strong>Incluye:</strong> reduce(), groupingBy(), partitioningBy(), Streams paralelos y más
+                </div>
+            </div>
+
             <div style="margin-top: 40px; text-align: center;">
                 <button class="btn-primary" onclick="volverInicio()">🏠 Volver al inicio</button>
                 <button class="btn-secondary" onclick="reiniciarProgreso()">↻ Reiniciar todo</button>
@@ -111,8 +124,11 @@
 
         crearHeader();
 
+        // Detener el cronómetro en la página de resumen
+        detenerCronometro();
+
         const progreso = getProgreso();
-        
+
         const equipoNombre = document.getElementById('equipo-nombre');
         const equipoClass = `equipo-${progreso.equipo}`;
         const equipoEmoji = {
@@ -125,10 +141,10 @@
         equipoNombre.textContent = `${equipoEmoji} Equipo ${progreso.equipo}`;
 
         const puntosTotales = getPuntosTotales();
-        document.getElementById('puntos-totales').textContent = puntosTotales;
+        document.getElementById('resumen-puntos-totales').textContent = puntosTotales;
 
         const badges = progreso.badges || [];
-        document.getElementById('badges-totales').textContent = badges.length;
+        document.getElementById('resumen-badges-totales').textContent = badges.length;
 
         if (badges.length > 0) {
             const badgesDiv = document.getElementById('badges-obtenidos');
@@ -161,8 +177,8 @@
 
         const fases = {
             'fase1': ['actividad1-1', 'actividad1-2', 'actividad1-3', 'actividad1-4'],
-            'fase2': ['actividad2-1', 'actividad2-2', 'actividad2-3'],
-            'fase3': ['actividad3-1', 'actividad3-2']
+            'fase2': ['actividad2-1', 'actividad2-2', 'actividad2-3', 'actividad2-4', 'actividad2-5', 'actividad2-6', 'actividad2-7'],
+            'fase3': ['actividad3-1', 'actividad3-2', 'actividad3-3', 'actividad3-4', 'actividad3-5', 'actividad3-6']
         };
 
         Object.keys(fases).forEach(faseId => {
@@ -170,13 +186,17 @@
             let totalIntentos = 0;
             let actividadesCompletadas = 0;
             let actividadesPerfectas = 0;
+            let totalPuntos = 0;
 
             actividades.forEach(actId => {
-                const intentos = progreso.intentosPorActividad[actId] || 0;
-                if (intentos > 0) {
+                // Buscar la actividad completada
+                const actCompletada = progreso.actividadesCompletadas.find(a => a.id === actId);
+
+                if (actCompletada) {
                     actividadesCompletadas++;
-                    totalIntentos += intentos;
-                    if (intentos === 1) actividadesPerfectas++;
+                    totalIntentos += actCompletada.intentos;
+                    totalPuntos += actCompletada.puntos || 0;
+                    if (actCompletada.intentos === 1) actividadesPerfectas++;
                 }
             });
 
@@ -194,6 +214,10 @@
                     <span class="stat-label">Perfectas (1 intento):</span>
                     <span class="stat-valor">${actividadesPerfectas}</span>
                 </div>
+                <div class="stat-item">
+                    <span class="stat-label">Puntos obtenidos:</span>
+                    <span class="stat-valor">${totalPuntos}</span>
+                </div>
             `;
         });
 
@@ -206,6 +230,10 @@
                 localStorage.removeItem('streamProgress');
                 window.location.href = 'index.html';
             }
+        }
+
+        function irContenidoAvanzado() {
+            window.location.href = 'teoria4-1.html';
         }
     </script>
 </body>

@@ -69,11 +69,16 @@ function otorgarBadge(badgeId) {
         progreso.badges = [];
     }
 
+    // Solo otorgar si no lo tiene ya
     if (!progreso.badges.includes(badgeId)) {
         progreso.badges.push(badgeId);
         saveProgreso(progreso);
+        actualizarDisplayBadges();
         mostrarNotificacionBadge(badgeId);
+        return true; // Badge otorgado
     }
+
+    return false; // Ya tenía el badge
 }
 
 function verificarBadges(actividadId, intentos) {
@@ -253,8 +258,8 @@ function cerrarModalBadge(overlayId) {
 
 function getPuntosTotales() {
     const progreso = getProgreso();
-    if (!progreso || !progreso.puntos) return 0;
-    return progreso.puntos;
+    if (!progreso) return 0;
+    return progreso.puntos || 0;
 }
 
 function agregarPuntos(puntos) {
@@ -278,13 +283,34 @@ function actualizarDisplayPuntos() {
     }
 }
 
+function actualizarDisplayActividades() {
+    const progreso = getProgreso();
+    if (!progreso) return;
+
+    const actividadesElement = document.getElementById('num-actividades');
+    if (actividadesElement) {
+        actividadesElement.textContent = progreso.actividadesCompletadas.length;
+    }
+}
+
+function actualizarDisplayBadges() {
+    const progreso = getProgreso();
+    if (!progreso) return;
+
+    const badgesElement = document.getElementById('num-badges');
+    if (badgesElement) {
+        const numBadges = progreso.badges ? progreso.badges.length : 0;
+        badgesElement.textContent = numBadges;
+    }
+}
+
 // ============================================
 // FUNCIONES DE PROGRESO
 // ============================================
 
 // Marcar actividad como completada
 function marcarActividadCompletada(actividadId, intentos, errores = []) {
-    const progreso = getProgreso();
+    let progreso = getProgreso();
     if (!progreso) return;
 
     const yaCompletada = progreso.actividadesCompletadas.find(a => a.id === actividadId);
@@ -295,6 +321,7 @@ function marcarActividadCompletada(actividadId, intentos, errores = []) {
 
     const puntos = calcularPuntos(intentos, tiempoSegundos);
 
+    // Añadir actividad completada
     progreso.actividadesCompletadas.push({
         id: actividadId,
         timestamp: Date.now(),
@@ -304,6 +331,13 @@ function marcarActividadCompletada(actividadId, intentos, errores = []) {
         puntos: puntos
     });
 
+    // Limpiar el inicio de actividad
+    delete progreso.actividadActualInicio;
+
+    // IMPORTANTE: Guardar primero la actividad completada
+    saveProgreso(progreso);
+
+    // Ahora agregar puntos y badges (que también guardan el progreso)
     agregarPuntos(puntos);
 
     if (tiempoSegundos < 120) {
@@ -312,8 +346,8 @@ function marcarActividadCompletada(actividadId, intentos, errores = []) {
 
     verificarBadges(actividadId, intentos);
 
-    delete progreso.actividadActualInicio;
-    saveProgreso(progreso);
+    // Actualizar displays
+    actualizarDisplayActividades();
 }
 
 function iniciarActividad() {
@@ -353,6 +387,9 @@ function formatearTiempo(milisegundos) {
     return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
 }
 
+// Variable global para el intervalo del cronómetro
+let intervaloCronometro = null;
+
 // Actualizar cronómetro en el header
 function actualizarCronometro() {
     const progreso = getProgreso();
@@ -367,8 +404,21 @@ function actualizarCronometro() {
 
 // Iniciar actualización del cronómetro
 function iniciarCronometro() {
+    // Detener cronómetro anterior si existe
+    if (intervaloCronometro) {
+        clearInterval(intervaloCronometro);
+    }
+
     actualizarCronometro();
-    setInterval(actualizarCronometro, 1000);
+    intervaloCronometro = setInterval(actualizarCronometro, 1000);
+}
+
+// Detener cronómetro
+function detenerCronometro() {
+    if (intervaloCronometro) {
+        clearInterval(intervaloCronometro);
+        intervaloCronometro = null;
+    }
 }
 
 // Crear header común
@@ -401,7 +451,7 @@ function crearHeader() {
             ⏱️ <span id="tiempo-actual">00:00</span>
         </div>
         <div class="progreso-info">
-            📊 Actividades: ${progreso.actividadesCompletadas.length}
+            📊 Actividades: <span id="num-actividades">${progreso.actividadesCompletadas.length}</span>
         </div>
         <div class="puntos-info">
             ⭐ <span id="puntos-totales">${puntos}</span> pts
