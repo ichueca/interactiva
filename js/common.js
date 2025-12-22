@@ -635,7 +635,7 @@ function configurarDragPiezas(contenedorSelector, slotsSelector) {
         // Mouse/Pointer events
         pieza.addEventListener('dragstart', handleDragStart);
         pieza.addEventListener('dragend', handleDragEnd);
-        
+
         // Touch events
         pieza.addEventListener('touchstart', handleTouchStart, { passive: false });
         pieza.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -647,6 +647,170 @@ function configurarDragPiezas(contenedorSelector, slotsSelector) {
         slot.addEventListener('drop', handleDrop);
         slot.addEventListener('dragleave', handleDragLeave);
     });
+}
+
+// Configurar drag & drop genérico para cualquier selector de elementos y slots
+// Parámetros:
+// - elementosSelector: selector CSS para los elementos arrastrables
+// - slotsSelector: selector CSS para las zonas de drop
+// - options: objeto con opciones adicionales
+//   - bancoId: ID del contenedor banco para devolver elementos (opcional)
+//   - slotClass: clase adicional para identificar slots en touch (opcional)
+//   - onDrop: callback que se ejecuta después del drop (opcional)
+//   - validateDrop: función de validación (elemento, slot) => boolean (opcional)
+//   - onDragStart: callback al iniciar drag (opcional)
+//   - onDragEnd: callback al terminar drag (opcional)
+function configurarDragGenerico(elementosSelector, slotsSelector, options = {}) {
+    const elementos = document.querySelectorAll(elementosSelector);
+    const slots = document.querySelectorAll(slotsSelector);
+
+    const config = {
+        bancoId: options.bancoId || null,
+        slotClass: options.slotClass || null,
+        onDrop: options.onDrop || null,
+        validateDrop: options.validateDrop || null,
+        onDragStart: options.onDragStart || null,
+        onDragEnd: options.onDragEnd || null
+    };
+
+    elementos.forEach(elemento => {
+        // Mouse/Pointer events
+        elemento.addEventListener('dragstart', (e) => {
+            handleDragStart.call(elemento, e);
+            if (config.onDragStart) config.onDragStart(elemento, e);
+        });
+        elemento.addEventListener('dragend', (e) => {
+            handleDragEnd.call(elemento, e);
+            if (config.onDragEnd) config.onDragEnd(elemento, e);
+        });
+
+        // Touch events con configuración
+        elemento.addEventListener('touchstart', (e) => handleTouchStartGenerico(e, config), { passive: false });
+        elemento.addEventListener('touchmove', handleTouchMove, { passive: false });
+        elemento.addEventListener('touchend', (e) => handleTouchEndGenerico(e, config), { passive: false });
+    });
+
+    slots.forEach(slot => {
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('drop', (e) => handleDropGenerico(e, config));
+        slot.addEventListener('dragleave', handleDragLeave);
+    });
+}
+
+function handleTouchStartGenerico(e, config) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    draggedElement = e.currentTarget;
+    draggedFrom = draggedElement.parentElement;
+
+    // Ejecutar callback onDragStart si existe
+    if (config.onDragStart) config.onDragStart(draggedElement, e);
+
+    // Crear clon visual
+    touchClone = draggedElement.cloneNode(true);
+    touchClone.style.position = 'fixed';
+    touchClone.style.zIndex = '10000';
+    touchClone.style.opacity = '0.8';
+    touchClone.style.pointerEvents = 'none';
+    touchClone.style.width = draggedElement.offsetWidth + 'px';
+    document.body.appendChild(touchClone);
+
+    touchClone.style.left = touch.clientX - draggedElement.offsetWidth / 2 + 'px';
+    touchClone.style.top = touch.clientY - 20 + 'px';
+
+    draggedElement.classList.add('dragging');
+}
+
+function handleTouchEndGenerico(e, config) {
+    e.preventDefault();
+    if (!draggedElement) return;
+
+    const touch = e.changedTouches[0];
+    const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    // Buscar el slot más cercano usando la clase configurada o clases por defecto
+    let slot = dropTarget;
+    const slotClasses = config.slotClass ? [config.slotClass] : ['slot', 'contenedor-drop', 'slot-drop', 'sandbox-drop', 'filtro-slot', 'slot-construccion', 'slot-inline'];
+
+    while (slot && !slotClasses.some(cls => slot.classList && slot.classList.contains(cls))) {
+        slot = slot.parentElement;
+    }
+
+    if (slot) {
+        // Validar el drop si hay función de validación
+        if (config.validateDrop && !config.validateDrop(draggedElement, slot)) {
+            // Si la validación falla, no hacer nada
+            draggedElement.classList.remove('dragging');
+            if (touchClone) {
+                document.body.removeChild(touchClone);
+            }
+            draggedElement = null;
+            draggedFrom = null;
+            touchClone = null;
+            return;
+        }
+
+        // Si hay un banco configurado y el slot ya tiene un elemento, devolverlo al banco
+        if (config.bancoId) {
+            const existente = slot.querySelector(draggedElement.tagName.toLowerCase() + '[draggable="true"]');
+            if (existente && existente !== draggedElement) {
+                const banco = document.getElementById(config.bancoId);
+                if (banco) banco.appendChild(existente);
+            }
+        }
+
+        slot.appendChild(draggedElement);
+        slot.classList.add('filled');
+
+        // Ejecutar callback si existe
+        if (config.onDrop) {
+            config.onDrop(draggedElement, slot);
+        }
+    }
+
+    // Ejecutar callback onDragEnd si existe
+    if (config.onDragEnd) config.onDragEnd(draggedElement, e);
+
+    draggedElement.classList.remove('dragging');
+    if (touchClone) {
+        document.body.removeChild(touchClone);
+    }
+    draggedElement = null;
+    draggedFrom = null;
+    touchClone = null;
+}
+
+function handleDropGenerico(e, config) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('over');
+
+    if (draggedElement) {
+        // Validar el drop si hay función de validación
+        if (config.validateDrop && !config.validateDrop(draggedElement, e.currentTarget)) {
+            // Si la validación falla, no hacer nada
+            return;
+        }
+
+        // Si hay un banco configurado y el slot ya tiene un elemento, devolverlo al banco
+        if (config.bancoId) {
+            const existente = e.currentTarget.querySelector(draggedElement.tagName.toLowerCase() + '[draggable="true"]');
+            if (existente && existente !== draggedElement) {
+                const banco = document.getElementById(config.bancoId);
+                if (banco) banco.appendChild(existente);
+            }
+        }
+
+        e.currentTarget.appendChild(draggedElement);
+        e.currentTarget.classList.add('filled');
+
+        // Ejecutar callback si existe
+        if (config.onDrop) {
+            config.onDrop(draggedElement, e.currentTarget);
+        }
+
+        draggedElement = null;
+        draggedFrom = null;
+    }
 }
 
 function handleDragStart(e) {

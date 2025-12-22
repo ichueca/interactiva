@@ -143,39 +143,104 @@ int max = numeros.max(Integer::compareTo).orElse(0);
             configurarSandbox();
         }
 
+        let draggedMetodo = null;
+        let touchCloneSandbox = null;
+
         function configurarSandbox() {
             const metodos = document.querySelectorAll('.metodo-pieza');
             const zonaDrops = document.querySelectorAll('.sandbox-drop');
-            
+
             metodos.forEach(metodo => {
+                // Mouse events
                 metodo.addEventListener('dragstart', (e) => {
+                    draggedMetodo = e.target;
                     e.dataTransfer.setData('metodo', e.target.dataset.metodo);
                     e.target.classList.add('dragging');
                 });
-                
+
                 metodo.addEventListener('dragend', (e) => {
                     e.target.classList.remove('dragging');
                 });
+
+                // Touch events
+                metodo.addEventListener('touchstart', handleMetodoTouchStart, { passive: false });
+                metodo.addEventListener('touchmove', handleMetodoTouchMove, { passive: false });
+                metodo.addEventListener('touchend', handleMetodoTouchEnd, { passive: false });
             });
-            
+
             zonaDrops.forEach(zona => {
                 zona.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     zona.classList.add('over');
                 });
-                
+
                 zona.addEventListener('dragleave', () => {
                     zona.classList.remove('over');
                 });
-                
+
                 zona.addEventListener('drop', (e) => {
                     e.preventDefault();
                     zona.classList.remove('over');
-                    
+
                     const metodo = e.dataTransfer.getData('metodo');
                     mostrarResultado(metodo);
                 });
             });
+        }
+
+        function handleMetodoTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            draggedMetodo = this;
+
+            // Crear clon visual
+            touchCloneSandbox = this.cloneNode(true);
+            touchCloneSandbox.style.position = 'fixed';
+            touchCloneSandbox.style.zIndex = '10000';
+            touchCloneSandbox.style.opacity = '0.8';
+            touchCloneSandbox.style.pointerEvents = 'none';
+            touchCloneSandbox.style.width = this.offsetWidth + 'px';
+            document.body.appendChild(touchCloneSandbox);
+
+            touchCloneSandbox.style.left = touch.clientX - this.offsetWidth / 2 + 'px';
+            touchCloneSandbox.style.top = touch.clientY - 20 + 'px';
+
+            this.classList.add('dragging');
+        }
+
+        function handleMetodoTouchMove(e) {
+            e.preventDefault();
+            if (!touchCloneSandbox) return;
+
+            const touch = e.touches[0];
+            touchCloneSandbox.style.left = touch.clientX - draggedMetodo.offsetWidth / 2 + 'px';
+            touchCloneSandbox.style.top = touch.clientY - 20 + 'px';
+        }
+
+        function handleMetodoTouchEnd(e) {
+            e.preventDefault();
+            if (!draggedMetodo) return;
+
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            // Buscar la zona de drop
+            let zona = dropTarget;
+            while (zona && !zona.classList.contains('sandbox-drop')) {
+                zona = zona.parentElement;
+            }
+
+            if (zona && zona.classList.contains('sandbox-drop')) {
+                const metodo = draggedMetodo.dataset.metodo;
+                mostrarResultado(metodo);
+            }
+
+            draggedMetodo.classList.remove('dragging');
+            if (touchCloneSandbox) {
+                document.body.removeChild(touchCloneSandbox);
+            }
+            draggedMetodo = null;
+            touchCloneSandbox = null;
         }
 
         function mostrarResultado(metodo) {

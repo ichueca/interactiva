@@ -98,44 +98,9 @@
         }
 
         function configurarDragDrop() {
-            const predicados = document.querySelectorAll('.predicado-pieza');
-            const slots = document.querySelectorAll('.filtro-slot');
-            
-            predicados.forEach(pred => {
-                pred.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('predicado', e.target.dataset.id);
-                    e.target.classList.add('dragging');
-                });
-                
-                pred.addEventListener('dragend', (e) => {
-                    e.target.classList.remove('dragging');
-                });
-            });
-            
-            slots.forEach(slot => {
-                slot.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    slot.classList.add('over');
-                });
-                
-                slot.addEventListener('dragleave', () => {
-                    slot.classList.remove('over');
-                });
-                
-                slot.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    slot.classList.remove('over');
-                    
-                    const predicadoId = e.dataTransfer.getData('predicado');
-                    const predicadoElement = document.querySelector(`[data-id="${predicadoId}"]`);
-                    
-                    const existente = slot.querySelector('.predicado-pieza');
-                    if (existente) {
-                        document.getElementById('banco').appendChild(existente);
-                    }
-                    
-                    slot.appendChild(predicadoElement);
-                });
+            configurarDragGenerico('.predicado-pieza', '.filtro-slot', {
+                bancoId: 'banco',
+                slotClass: 'filtro-slot'
             });
         }
 
