@@ -97,46 +97,116 @@
             operaciones.forEach(op => banco.appendChild(op));
         }
 
+        let draggedOperacion = null;
+        let touchCloneMatching = null;
+
         function configurarMatching() {
             const operaciones = document.querySelectorAll('.operacion-pieza');
             const slots = document.querySelectorAll('.slot-drop');
-            
+
             operaciones.forEach(op => {
+                // Mouse events
                 op.addEventListener('dragstart', (e) => {
+                    draggedOperacion = e.target;
                     e.dataTransfer.setData('operacion', e.target.dataset.id);
                     e.target.classList.add('dragging');
                 });
-                
+
                 op.addEventListener('dragend', (e) => {
                     e.target.classList.remove('dragging');
                 });
+
+                // Touch events
+                op.addEventListener('touchstart', handleOperacionTouchStart, { passive: false });
+                op.addEventListener('touchmove', handleOperacionTouchMove, { passive: false });
+                op.addEventListener('touchend', handleOperacionTouchEnd, { passive: false });
             });
-            
+
             slots.forEach(slot => {
                 slot.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     slot.classList.add('over');
                 });
-                
+
                 slot.addEventListener('dragleave', () => {
                     slot.classList.remove('over');
                 });
-                
+
                 slot.addEventListener('drop', (e) => {
                     e.preventDefault();
                     slot.classList.remove('over');
-                    
+
                     const operacionId = e.dataTransfer.getData('operacion');
                     const operacionElement = document.querySelector(`[data-id="${operacionId}"]`);
-                    
+
                     const existente = slot.querySelector('.operacion-pieza');
                     if (existente) {
                         document.getElementById('operaciones-banco').appendChild(existente);
                     }
-                    
+
                     slot.appendChild(operacionElement);
                 });
             });
+        }
+
+        function handleOperacionTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            draggedOperacion = this;
+
+            // Crear clon visual
+            touchCloneMatching = this.cloneNode(true);
+            touchCloneMatching.style.position = 'fixed';
+            touchCloneMatching.style.zIndex = '10000';
+            touchCloneMatching.style.opacity = '0.8';
+            touchCloneMatching.style.pointerEvents = 'none';
+            touchCloneMatching.style.width = this.offsetWidth + 'px';
+            document.body.appendChild(touchCloneMatching);
+
+            touchCloneMatching.style.left = touch.clientX - this.offsetWidth / 2 + 'px';
+            touchCloneMatching.style.top = touch.clientY - 20 + 'px';
+
+            this.classList.add('dragging');
+        }
+
+        function handleOperacionTouchMove(e) {
+            e.preventDefault();
+            if (!touchCloneMatching) return;
+
+            const touch = e.touches[0];
+            touchCloneMatching.style.left = touch.clientX - draggedOperacion.offsetWidth / 2 + 'px';
+            touchCloneMatching.style.top = touch.clientY - 20 + 'px';
+        }
+
+        function handleOperacionTouchEnd(e) {
+            e.preventDefault();
+            if (!draggedOperacion) return;
+
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            // Buscar el slot más cercano
+            let slot = dropTarget;
+            while (slot && !slot.classList.contains('slot-drop')) {
+                slot = slot.parentElement;
+            }
+
+            if (slot && slot.classList.contains('slot-drop')) {
+                // Devolver elemento existente al banco si hay uno
+                const existente = slot.querySelector('.operacion-pieza');
+                if (existente) {
+                    document.getElementById('operaciones-banco').appendChild(existente);
+                }
+
+                slot.appendChild(draggedOperacion);
+            }
+
+            draggedOperacion.classList.remove('dragging');
+            if (touchCloneMatching) {
+                document.body.removeChild(touchCloneMatching);
+            }
+            draggedOperacion = null;
+            touchCloneMatching = null;
         }
 
         function validar() {

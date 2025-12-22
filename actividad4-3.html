@@ -126,59 +126,12 @@
         }
 
         function configurarDragDrop() {
-            const operaciones = document.querySelectorAll('.operacion-pieza');
-            const stages = document.querySelectorAll('.stage-dropzone');
-
-            operaciones.forEach(op => {
-                op.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('operacion', e.target.dataset.id);
-                    e.target.classList.add('dragging');
-                    iniciarAutoScroll();
-                });
-
-                op.addEventListener('dragend', (e) => {
-                    e.target.classList.remove('dragging');
-                    detenerAutoScroll();
-                });
-
-                // Para dispositivos táctiles
-                op.addEventListener('touchstart', (e) => {
-                    e.target.classList.add('dragging');
-                });
-
-                op.addEventListener('touchend', (e) => {
-                    e.target.classList.remove('dragging');
-                    detenerAutoScroll();
-                });
-            });
-
-            stages.forEach(stage => {
-                stage.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    stage.classList.add('over');
-                });
-
-                stage.addEventListener('dragleave', () => {
-                    stage.classList.remove('over');
-                });
-
-                stage.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    stage.classList.remove('over');
-
-                    const operacionId = e.dataTransfer.getData('operacion');
-                    const operacionElement = document.querySelector(`[data-id="${operacionId}"]`);
-
-                    // Si ya hay una operación, devolverla al banco
-                    const existente = stage.querySelector('.operacion-pieza');
-                    if (existente) {
-                        document.getElementById('banco').appendChild(existente);
-                    }
-
-                    stage.appendChild(operacionElement);
-                    stage.classList.add('filled');
-                    actualizarPipeline();
-                });
+            configurarDragGenerico('.operacion-pieza', '.stage-dropzone', {
+                bancoId: 'banco',
+                slotClass: 'stage-dropzone',
+                onDragStart: iniciarAutoScroll,
+                onDragEnd: detenerAutoScroll,
+                onDrop: actualizarPipeline
             });
 
             // Permitir devolver al banco

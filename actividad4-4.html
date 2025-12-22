@@ -118,12 +118,17 @@
             intentos = getIntentos(ACTIVIDAD_ID);
         }
 
+        let draggedCorreccion = null;
+        let touchClone4_4 = null;
+
         function configurarDragDrop() {
             const piezas = document.querySelectorAll('.correccion-pieza');
             const lineasError = document.querySelectorAll('.error-linea');
-            
+
             piezas.forEach(pieza => {
+                // Mouse events
                 pieza.addEventListener('dragstart', (e) => {
+                    draggedCorreccion = e.target;
                     e.dataTransfer.setData('correccion', e.target.dataset.id);
                     e.target.classList.add('dragging');
                     iniciarAutoScroll();
@@ -133,6 +138,11 @@
                     e.target.classList.remove('dragging');
                     detenerAutoScroll();
                 });
+
+                // Touch events
+                pieza.addEventListener('touchstart', handleCorreccionTouchStart, { passive: false });
+                pieza.addEventListener('touchmove', handleCorreccionTouchMove, { passive: false });
+                pieza.addEventListener('touchend', handleCorreccionTouchEnd, { passive: false });
             });
             
             lineasError.forEach(linea => {
@@ -170,6 +180,82 @@
                     correccionElement.style.display = 'none';
                 });
             });
+        }
+
+        function handleCorreccionTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            draggedCorreccion = this;
+
+            iniciarAutoScroll();
+
+            // Crear clon visual
+            touchClone4_4 = this.cloneNode(true);
+            touchClone4_4.style.position = 'fixed';
+            touchClone4_4.style.zIndex = '10000';
+            touchClone4_4.style.opacity = '0.8';
+            touchClone4_4.style.pointerEvents = 'none';
+            touchClone4_4.style.width = this.offsetWidth + 'px';
+            document.body.appendChild(touchClone4_4);
+
+            touchClone4_4.style.left = touch.clientX - this.offsetWidth / 2 + 'px';
+            touchClone4_4.style.top = touch.clientY - 20 + 'px';
+
+            this.classList.add('dragging');
+        }
+
+        function handleCorreccionTouchMove(e) {
+            e.preventDefault();
+            if (!touchClone4_4) return;
+
+            const touch = e.touches[0];
+            touchClone4_4.style.left = touch.clientX - draggedCorreccion.offsetWidth / 2 + 'px';
+            touchClone4_4.style.top = touch.clientY - 20 + 'px';
+        }
+
+        function handleCorreccionTouchEnd(e) {
+            e.preventDefault();
+            if (!draggedCorreccion) return;
+
+            detenerAutoScroll();
+
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            // Buscar la línea de error
+            let linea = dropTarget;
+            while (linea && !linea.classList.contains('error-linea')) {
+                linea = linea.parentElement;
+            }
+
+            if (linea && linea.classList.contains('error-linea')) {
+                const correccionId = draggedCorreccion.dataset.id;
+                const numeroLinea = parseInt(linea.id.split('-')[1]);
+
+                // Devolver corrección anterior si existe
+                if (correcciones_aplicadas[numeroLinea]) {
+                    const anterior = document.querySelector(`[data-id="${correcciones_aplicadas[numeroLinea]}"]`);
+                    if (anterior) {
+                        document.getElementById('banco').appendChild(anterior);
+                        anterior.style.display = 'block';
+                    }
+                }
+
+                // Aplicar nueva corrección
+                correcciones_aplicadas[numeroLinea] = correccionId;
+                document.getElementById(`texto-linea-${numeroLinea}`).textContent = draggedCorreccion.textContent;
+                linea.classList.add('corregida');
+
+                // Ocultar la pieza (ya está aplicada)
+                draggedCorreccion.style.display = 'none';
+            }
+
+            draggedCorreccion.classList.remove('dragging');
+            if (touchClone4_4) {
+                document.body.removeChild(touchClone4_4);
+            }
+            draggedCorreccion = null;
+            touchClone4_4 = null;
         }
 
         function validar() {

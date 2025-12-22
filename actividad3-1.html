@@ -102,44 +102,9 @@
         }
 
         function configurarDragDrop() {
-            const operaciones = document.querySelectorAll('.operacion-terminal-pieza');
-            const slots = document.querySelectorAll('.situacion-slot');
-            
-            operaciones.forEach(op => {
-                op.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('operacion', e.target.dataset.id);
-                    e.target.classList.add('dragging');
-                });
-                
-                op.addEventListener('dragend', (e) => {
-                    e.target.classList.remove('dragging');
-                });
-            });
-            
-            slots.forEach(slot => {
-                slot.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    slot.classList.add('over');
-                });
-                
-                slot.addEventListener('dragleave', () => {
-                    slot.classList.remove('over');
-                });
-                
-                slot.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    slot.classList.remove('over');
-                    
-                    const opId = e.dataTransfer.getData('operacion');
-                    const opElement = document.querySelector(`[data-id="${opId}"]`);
-                    
-                    const existente = slot.querySelector('.operacion-terminal-pieza');
-                    if (existente) {
-                        document.getElementById('banco').appendChild(existente);
-                    }
-                    
-                    slot.appendChild(opElement);
-                });
+            configurarDragGenerico('.operacion-terminal-pieza', '.situacion-slot', {
+                bancoId: 'banco',
+                slotClass: 'situacion-slot'
             });
         }
 

@@ -96,45 +96,10 @@
         }
 
         function configurarConstructor() {
-            const piezas = document.querySelectorAll('.pieza-codigo');
-            const slots = document.querySelectorAll('.slot-construccion');
-            
-            piezas.forEach(pieza => {
-                pieza.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('pieza', e.target.dataset.id);
-                    e.target.classList.add('dragging');
-                });
-                
-                pieza.addEventListener('dragend', (e) => {
-                    e.target.classList.remove('dragging');
-                });
-            });
-            
-            slots.forEach(slot => {
-                slot.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    slot.classList.add('over');
-                });
-                
-                slot.addEventListener('dragleave', () => {
-                    slot.classList.remove('over');
-                });
-                
-                slot.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    slot.classList.remove('over');
-                    
-                    const piezaId = e.dataTransfer.getData('pieza');
-                    const piezaElement = document.querySelector(`[data-id="${piezaId}"]`);
-                    
-                    const existente = slot.querySelector('.pieza-codigo');
-                    if (existente) {
-                        document.getElementById('banco').appendChild(existente);
-                    }
-                    
-                    slot.appendChild(piezaElement);
-                    actualizarCodigoResultado();
-                });
+            configurarDragGenerico('.pieza-codigo', '.slot-construccion', {
+                bancoId: 'banco',
+                slotClass: 'slot-construccion',
+                onDrop: actualizarCodigoResultado
             });
         }
 

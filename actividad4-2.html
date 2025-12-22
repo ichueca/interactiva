@@ -121,12 +121,17 @@
             intentos = getIntentos(ACTIVIDAD_ID);
         }
 
+        let draggedPieza = null;
+        let touchClone4_2 = null;
+
         function configurarDragDrop() {
             const piezas = document.querySelectorAll('.pieza-codigo');
             const slotsElements = document.querySelectorAll('.slot-inline');
 
             piezas.forEach(pieza => {
+                // Mouse events
                 pieza.addEventListener('dragstart', (e) => {
+                    draggedPieza = e.target;
                     e.dataTransfer.setData('pieza', e.target.dataset.id);
                     e.dataTransfer.setData('tipo', e.target.dataset.tipo);
                     e.target.classList.add('dragging');
@@ -137,6 +142,11 @@
                     e.target.classList.remove('dragging');
                     detenerAutoScroll();
                 });
+
+                // Touch events
+                pieza.addEventListener('touchstart', handlePiezaTouchStart, { passive: false });
+                pieza.addEventListener('touchmove', handlePiezaTouchMove, { passive: false });
+                pieza.addEventListener('touchend', handlePiezaTouchEnd, { passive: false });
             });
 
             slotsElements.forEach(slot => {
@@ -198,6 +208,86 @@
                     }
                 });
             });
+        }
+
+        function handlePiezaTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            draggedPieza = this;
+
+            iniciarAutoScroll();
+
+            // Crear clon visual
+            touchClone4_2 = this.cloneNode(true);
+            touchClone4_2.style.position = 'fixed';
+            touchClone4_2.style.zIndex = '10000';
+            touchClone4_2.style.opacity = '0.8';
+            touchClone4_2.style.pointerEvents = 'none';
+            touchClone4_2.style.width = this.offsetWidth + 'px';
+            document.body.appendChild(touchClone4_2);
+
+            touchClone4_2.style.left = touch.clientX - this.offsetWidth / 2 + 'px';
+            touchClone4_2.style.top = touch.clientY - 20 + 'px';
+
+            this.classList.add('dragging');
+        }
+
+        function handlePiezaTouchMove(e) {
+            e.preventDefault();
+            if (!touchClone4_2) return;
+
+            const touch = e.touches[0];
+            touchClone4_2.style.left = touch.clientX - draggedPieza.offsetWidth / 2 + 'px';
+            touchClone4_2.style.top = touch.clientY - 20 + 'px';
+        }
+
+        function handlePiezaTouchEnd(e) {
+            e.preventDefault();
+            if (!draggedPieza) return;
+
+            detenerAutoScroll();
+
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            // Buscar el slot
+            let slot = dropTarget;
+            while (slot && !slot.classList.contains('slot-inline')) {
+                slot = slot.parentElement;
+            }
+
+            if (slot && slot.classList.contains('slot-inline')) {
+                const piezaId = draggedPieza.dataset.id;
+                const piezaTipo = draggedPieza.dataset.tipo;
+                const slotTipo = slot.dataset.tipo;
+
+                // Verificar que el tipo coincida
+                if (piezaTipo !== slotTipo) {
+                    mostrarMensajeError('⚠️ Esa pieza no va en este slot');
+                } else {
+                    // Si ya hay una pieza, devolverla al banco
+                    if (slots[slotTipo]) {
+                        const anterior = document.querySelector(`[data-id="${slots[slotTipo]}"]`);
+                        if (anterior) {
+                            document.getElementById('banco').appendChild(anterior);
+                            anterior.style.display = 'block';
+                        }
+                    }
+
+                    // Colocar nueva pieza
+                    slots[slotTipo] = piezaId;
+                    slot.textContent = draggedPieza.textContent;
+                    slot.classList.add('filled');
+                    draggedPieza.style.display = 'none';
+                }
+            }
+
+            draggedPieza.classList.remove('dragging');
+            if (touchClone4_2) {
+                document.body.removeChild(touchClone4_2);
+            }
+            draggedPieza = null;
+            touchClone4_2 = null;
         }
 
         function mostrarMensajeError(mensaje) {
